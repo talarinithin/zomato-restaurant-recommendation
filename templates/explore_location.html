@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Restaurants - Restaurant Recommendation System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: slideDown 0.6s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        /* ===== SEARCH CARD ===== */
+        .search-card {
+            background: white;
+            border-radius: 15px;
+            padding: 35px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .search-card h2 {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .search-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        .form-group select {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-explore {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-explore:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* ===== RESULTS SECTION ===== */
+        .results-section {
+            display: none;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        .results-header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        }
+
+        .results-header h2 {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .location-title {
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        .results-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8f0ff 100%);
+            padding: 16px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #999;
+            margin-top: 5px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* ===== RESTAURANTS SECTION ===== */
+        .restaurants-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .restaurants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .restaurant-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8f0ff 100%);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            cursor: pointer;
+        }
+
+        .restaurant-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+            background: linear-gradient(135deg, #e8f0ff 0%, #dde6f7 100%);
+        }
+
+        .restaurant-card.rank-1 {
+            border-left-color: #ffd700;
+            background: linear-gradient(135deg, #fffbf0 0%, #fff9e6 100%);
+        }
+
+        .restaurant-card.rank-2 {
+            border-left-color: #c0c0c0;
+            background: linear-gradient(135deg, #f9f9f9 0%, #f5f5f5 100%);
+        }
+
+        .restaurant-card.rank-3 {
+            border-left-color: #cd7f32;
+            background: linear-gradient(135deg, #fef5f0 0%, #fef0eb 100%);
+        }
+
+        .restaurant-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .restaurant-rank {
+            font-size: 1.8em;
+        }
+
+        .restaurant-name {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #333;
+            flex: 1;
+        }
+
+        .restaurant-info {
+            font-size: 0.9em;
+            color: #999;
+            margin-bottom: 12px;
+        }
+
+        .dishes-list {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        .dishes-label {
+            font-size: 0.8em;
+            color: #999;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .dishes-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .dish-tag {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        /* ===== TABLE SECTION ===== */
+        .table-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            overflow-x: auto;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-size: 0.85em;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tr:hover {
+            background: #f9f9f9;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .veg-tag {
+            background: #c8e6c9;
+            color: #2e7d32;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .nonveg-tag {
+            background: #ffcccc;
+            color: #c62828;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        /* ===== LOADING ===== */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #c62828;
+        }
+
+        /* Responsive */
+        @media (max-width: 1000px) {
+            .search-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-explore {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .restaurants-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-card {
+                padding: 20px;
+            }
+
+            th, td {
+                padding: 10px 8px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>🔍 Explore Restaurants</h1>
+            <p>Discover all restaurants and dishes in your area</p>
+        </div>
+
+        <!-- SEARCH CARD -->
+        <div class="search-card">
+            <h2>📍 Select a Location</h2>
+            <div class="search-grid">
+                <div class="form-group">
+                    <label>Choose Location:</label>
+                    <select id="locationSelect" onchange="exploreLocation()">
+                        <option value="">-- Select Location --</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTS SECTION -->
+        <div class="results-section" id="resultsSection">
+            <!-- RESULTS HEADER -->
+            <div class="results-header">
+                <h2>
+                    📍 <span class="location-title" id="selectedLocation"></span>
+                </h2>
+                <div class="results-stats" id="statsContainer"></div>
+            </div>
+
+            <!-- ERROR MESSAGE -->
+            <div id="errorContainer"></div>
+
+            <!-- LOADING STATE -->
+            <div id="loadingContainer"></div>
+
+            <!-- RESTAURANTS CARDS -->
+            <div class="restaurants-section" id="restaurantsCardsSection">
+                <div class="section-title">🍴 All Restaurants</div>
+                <div class="restaurants-grid" id="restaurantsGrid"></div>
+            </div>
+
+            <!-- DATA TABLE -->
+            <div class="table-section" id="tableSection">
+                <div class="section-title">📋 Complete Data</div>
+                <div class="table-wrapper">
+                    <table id="dataTable">
+                        <thead>
+                            <tr>
+                                <th>Restaurant Name</th>
+                                <th>Dish</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allLocations = [];
+
+        // Load locations on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLocations();
+        });
+
+        function loadLocations() {
+            fetch('/api/get-locations')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        allLocations = data.locations;
+                        const select = document.getElementById('locationSelect');
+                        
+                        data.locations.forEach(loc => {
+                            const option = document.createElement('option');
+                            option.value = loc;
+                            option.textContent = loc.charAt(0).toUpperCase() + loc.slice(1);
+                            select.appendChild(option);
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    showError('Failed to load locations');
+                });
+        }
+
+        function exploreLocation() {
+            const location = document.getElementById('locationSelect').value;
+
+            if (!location) {
+                document.getElementById('resultsSection').classList.remove('show');
+                return;
+            }
+
+            document.getElementById('resultsSection').classList.add('show');
+            document.getElementById('selectedLocation').textContent = location.toUpperCase();
+
+            showLoading();
+
+            fetch('/api/explore-location', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ location: location })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    displayResults(data);
+                } else {
+                    showError(data.error || 'Location not found');
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                showError('Error fetching location data');
+            });
+        }
+
+        function displayResults(data) {
+            // Hide loading
+            document.getElementById('loadingContainer').innerHTML = '';
+            document.getElementById('errorContainer').innerHTML = '';
+
+            // Display Stats
+            displayStats(data.stats);
+
+            // Display Restaurants
+            displayRestaurants(data.restaurants);
+
+            // Display Table
+            displayTable(data.dishes);
+        }
+
+        function displayStats(stats) {
+            const statsContainer = document.getElementById('statsContainer');
+            
+            let html = `
+                <div class="stat-box">
+                    <div class="stat-number">${stats.total_restaurants}</div>
+                    <div class="stat-label">Total Restaurants</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">${stats.total_unique_dishes}</div>
+                    <div class="stat-label">Unique Dishes</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">${stats.veg_restaurants}</div>
+                    <div class="stat-label">Veg Restaurants</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">${stats.nonveg_restaurants}</div>
+                    <div class="stat-label">Non-Veg Restaurants</div>
+                </div>
+            `;
+
+            statsContainer.innerHTML = html;
+        }
+
+        function displayRestaurants(restaurants) {
+            const grid = document.getElementById('restaurantsGrid');
+            let html = '';
+
+            restaurants.forEach((rest, idx) => {
+                const rankEmoji = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : '⭐';
+                const rankClass = idx < 3 ? `rank-${idx + 1}` : '';
+
+                html += `
+                    <div class="restaurant-card ${rankClass}">
+                        <div class="restaurant-header">
+                            <span class="restaurant-rank">${rankEmoji}</span>
+                            <div class="restaurant-name">${rest.name}</div>
+                        </div>
+                        <div class="restaurant-info">
+                            🍖 ${rest.type.charAt(0).toUpperCase() + rest.type.slice(1)}
+                        </div>
+                        <div class="dishes-list">
+                            <div class="dishes-label">🍽️ Dishes</div>
+                            <div class="dishes-items">
+                                ${rest.dishes.slice(0, 5).map(d => 
+                                    `<span class="dish-tag">${d}</span>`
+                                ).join('')}
+                                ${rest.dishes.length > 5 ? 
+                                    `<span class="dish-tag">+${rest.dishes.length - 5} more</span>` 
+                                    : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+        }
+
+        function displayTable(dishes) {
+            const tbody = document.getElementById('tableBody');
+            let html = '';
+
+            dishes.forEach(dish => {
+                const typeTag = dish.type === 'veg' 
+                    ? `<span class="veg-tag">Veg</span>` 
+                    : `<span class="nonveg-tag">Non-Veg</span>`;
+
+                html += `
+                    <tr>
+                        <td><strong>${dish.restaurant}</strong></td>
+                        <td>${dish.dish}</td>
+                        <td>${typeTag}</td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        function showLoading() {
+            document.getElementById('loadingContainer').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <div class="loading-text">Loading location data...</div>
+                </div>
+            `;
+        }
+
+        function showError(message) {
+            document.getElementById('errorContainer').innerHTML = `
+                <div class="error">
+                    ❌ <strong>Error:</strong> ${message}
+                </div>
+            `;
+
+            document.getElementById('restaurantsCardsSection').style.display = 'none';
+            document.getElementById('tableSection').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
