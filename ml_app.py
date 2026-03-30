@@ -1,6 +1,7 @@
 """
 Restaurant Recommendation System - Web Interface
 Integrated with your ML model and data
+NOW USING SQLite DATABASE instead of CSV!
 """
 
 from flask import Flask, render_template, request, jsonify
@@ -12,20 +13,23 @@ from difflib import get_close_matches
 from math import radians, sin, cos, asin, sqrt
 import traceback
 import pickle
+import time
+
+# Import our SQLite database utilities
+import db_utils
 
 app = Flask(__name__)
 
 # =====================================================
-# FILE PATHS - UPDATE THESE WITH YOUR ACTUAL PATHS
+# FILE PATHS
 # =====================================================
 
-# Update these paths to match your project structure
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Example paths - modify based on your actual file locations
-DATASET_PATH = os.path.join(BASE_DIR, "data", "processed","final_dataset.csv")  # Your main dataset
-LOCATIONS_PATH = os.path.join(BASE_DIR, "data", "enriched","restaurant_locations.csv")  # Location coordinates
-MODEL_PATH = os.path.join(BASE_DIR, "models", "best_model.pkl")  # Your ML model
+# CSV paths (used as fallback if SQLite fails)
+DATASET_PATH = os.path.join(BASE_DIR, "data", "processed", "final_dataset.csv")
+LOCATIONS_PATH = os.path.join(BASE_DIR, "data", "enriched", "restaurant_locations.csv")
+MODEL_PATH = os.path.join(BASE_DIR, "models", "best_model.pkl")
 
 # Global variables
 df = None
@@ -33,34 +37,61 @@ loc_df = None
 model = None
 scaler = None
 
+# Simple in-memory caches (speeds up dashboard/home significantly)
+_dishes_cache = {
+    "built": False,
+    "all_dishes": set(),
+    "top_dishes": [],  # list[tuple[str, int]]
+}
+_dashboard_cache = {
+    "ts": 0.0,
+    "ttl_s": 120.0,  # recompute every 2 minutes
+    "payload": None,
+}
+
 # =====================================================
-# LOAD DATA & MODEL ON STARTUP
+# LOAD DATA & MODEL ON STARTUP (NOW USING SQLite!)
 # =====================================================
 
 def load_all_data():
-    """Load dataset, locations, and trained model"""
+    """Load dataset from SQLite, locations, and trained model"""
     global df, loc_df, model, scaler
     
     try:
         print("[INFO] Loading data and model...")
+        print("[INFO] 🗄️ Using SQLite database for data storage")
         
-        # Load main dataset
-        if os.path.exists(DATASET_PATH):
-            df = pd.read_csv(DATASET_PATH)
-            print(f"✓ Loaded dataset: {len(df)} rows")
+        # Initialize SQLite database (creates from CSV if needed)
+        db_utils.init_database()
+        
+        # Load main dataset from SQLite
+        df = db_utils.load_restaurants_df()
+        if df is not None and len(df) > 0:
+            print(f"✓ Loaded dataset from SQLite: {len(df)} rows")
         else:
-            print(f"❌ Dataset not found: {DATASET_PATH}")
-            return False
+            # Fallback to CSV
+            print("[WARNING] SQLite load failed, falling back to CSV...")
+            if os.path.exists(DATASET_PATH):
+                df = pd.read_csv(DATASET_PATH)
+                print(f"✓ Loaded dataset from CSV: {len(df)} rows")
+            else:
+                print(f"❌ Dataset not found: {DATASET_PATH}")
+                return False
         
-        # Load location data
-        if os.path.exists(LOCATIONS_PATH):
-            loc_df = pd.read_csv(LOCATIONS_PATH)
-            print(f"✓ Loaded locations: {len(loc_df)} restaurants")
+        # Load location data from SQLite
+        loc_df = db_utils.load_locations_df()
+        if loc_df is not None and len(loc_df) > 0:
+            print(f"✓ Loaded locations from SQLite: {len(loc_df)} restaurants")
         else:
-            print(f"⚠ Locations file not found: {LOCATIONS_PATH}")
-            loc_df = None
+            # Fallback to CSV
+            if os.path.exists(LOCATIONS_PATH):
+                loc_df = pd.read_csv(LOCATIONS_PATH)
+                print(f"✓ Loaded locations from CSV: {len(loc_df)} restaurants")
+            else:
+                print(f"⚠ Locations file not found")
+                loc_df = None
         
-        # Load model
+        # Load ML model
         if os.path.exists(MODEL_PATH):
             model = joblib.load(MODEL_PATH)
             print("✓ Loaded ML model")
@@ -68,13 +99,13 @@ def load_all_data():
             print(f"❌ Model not found: {MODEL_PATH}")
             return False
         
-        # Normalize data
+        # Normalize data (SQLite data should already be normalized, but just in case)
         if df is not None:
             for col in ['name', 'location', 'veg_nonveg_type', 'dish_liked', 'cuisines']:
                 if col in df.columns:
                     df[col] = df[col].astype(str).str.lower().str.strip()
         
-        print("✓ Data loaded successfully")
+        print("✓ All data loaded successfully from SQLite! 🎉")
         return True
         
     except Exception as e:
@@ -146,22 +177,49 @@ def suggest_dishes(user_dish, available_dishes):
     
     return matches[:5]
 
+def _build_dishes_cache_if_needed():
+    """Build dish caches once (vectorized), reused across endpoints."""
+    global _dishes_cache
+    if _dishes_cache["built"] or df is None or len(df) == 0:
+        return
+
+    def _series_to_tokens(s: pd.Series) -> pd.Series:
+        s = s.dropna().astype(str).str.lower()
+        # Remove common "nan" string artifacts
+        s = s[s.ne("nan") & s.ne("none") & s.ne("")]
+        # Split/explode tokens
+        tokens = s.str.split(",").explode().astype(str)
+        tokens = tokens.str.strip()
+        # Normalize common spellings
+        tokens = (
+            tokens.str.replace("biriyani", "biryani", regex=False)
+                  .str.replace("biriani", "biryani", regex=False)
+        )
+        tokens = tokens[tokens.str.len().fillna(0) > 2]
+        return tokens
+
+    dish_tokens = pd.Series(dtype=str)
+    if "dish_liked" in df.columns:
+        dish_tokens = pd.concat([dish_tokens, _series_to_tokens(df["dish_liked"])], ignore_index=True)
+    if "cuisines" in df.columns:
+        dish_tokens = pd.concat([dish_tokens, _series_to_tokens(df["cuisines"])], ignore_index=True)
+
+    if dish_tokens.empty:
+        _dishes_cache["all_dishes"] = set()
+        _dishes_cache["top_dishes"] = []
+        _dishes_cache["built"] = True
+        return
+
+    vc = dish_tokens.value_counts()
+    _dishes_cache["all_dishes"] = set(vc.index.tolist())
+    _dishes_cache["top_dishes"] = list(zip(vc.index[:10].tolist(), vc.iloc[:10].astype(int).tolist()))
+    _dishes_cache["built"] = True
+
+
 def get_all_unique_dishes():
-    """Extract all unique dishes from dataset"""
-    all_dishes = set()
-    
-    for _, row in df.iterrows():
-        if pd.notna(row.get('dish_liked')):
-            dishes = str(row['dish_liked']).split(',')
-            for dish in dishes:
-                all_dishes.add(dish.strip().lower())
-        
-        if pd.notna(row.get('cuisines')):
-            cuisines = str(row['cuisines']).split(',')
-            for cuisine in cuisines:
-                all_dishes.add(cuisine.strip().lower())
-    
-    return all_dishes
+    """Extract all unique dishes from dataset (cached)."""
+    _build_dishes_cache_if_needed()
+    return _dishes_cache["all_dishes"]
 
 def is_nonveg_dish(dish_name):
     """Check if dish is non-veg based on keywords"""
@@ -236,41 +294,50 @@ def dashboard_analytics():
         if df is None:
             return jsonify({'error': 'Data not loaded'}), 500
 
+        # Fast path: return cached payload (makes dashboard feel instant)
+        now = time.time()
+        if _dashboard_cache["payload"] is not None and (now - _dashboard_cache["ts"]) < _dashboard_cache["ttl_s"]:
+            return jsonify(_dashboard_cache["payload"])
+
         # Overall Stats
-        all_dishes = get_all_unique_dishes()
+        _build_dishes_cache_if_needed()
         stats = {
             'total_restaurants': int(df['name'].nunique()),
             'total_locations': int(df['location'].nunique()),
-            'total_dishes': len(all_dishes),
-            'avg_rating': float(df['rate'].mean())
+            'total_dishes': int(len(_dishes_cache["all_dishes"])),
+            'avg_rating': float(df['rate'].mean()) if 'rate' in df.columns else 0
         }
 
         # 1. Restaurants by Location
-        restaurants_by_location = []
-        for loc in df['location'].unique():
-            count = df[df['location'] == loc]['name'].nunique()
-            restaurants_by_location.append({
-                'location': loc.title(),
-                'count': int(count)
-            })
-        restaurants_by_location = sorted(restaurants_by_location, 
-                                        key=lambda x: x['count'], 
-                                        reverse=True)
+        loc_counts = (
+            df.groupby('location')['name']
+              .nunique()
+              .sort_values(ascending=False)
+        )
+        restaurants_by_location = [
+            {'location': str(loc).title(), 'count': int(count)}
+            for loc, count in loc_counts.items()
+        ]
 
         # 2. Veg vs Non-Veg Distribution
+        vt = df['veg_nonveg_type'] if 'veg_nonveg_type' in df.columns else pd.Series([], dtype=str)
+        vt_counts = vt.value_counts(dropna=False)
         veg_dist = {
-            'Veg': int((df['veg_nonveg_type'] == 'veg').sum()),
-            'Non-Veg': int((df['veg_nonveg_type'] == 'nonveg').sum()),
-            'Both': int((df['veg_nonveg_type'] == 'both').sum())
+            'Veg': int(vt_counts.get('veg', 0)),
+            'Non-Veg': int(vt_counts.get('nonveg', 0)),
+            'Both': int(vt_counts.get('both', 0)),
         }
 
         # 3. Rating Distribution
         rating_dist = []
-        for rating in [1, 2, 3, 4, 5]:
-            count = int(((df['rate'] >= rating - 0.5) & 
-                        (df['rate'] < rating + 0.5)).sum())
-            if count > 0:
-                rating_dist.append({'rating': float(rating), 'count': count})
+        if 'rate' in df.columns:
+            r = pd.to_numeric(df['rate'], errors='coerce').dropna()
+            if not r.empty:
+                bins = [0.5, 1.5, 2.5, 3.5, 4.5, 5.5]
+                labels = [1, 2, 3, 4, 5]
+                b = pd.cut(r, bins=bins, labels=labels, include_lowest=True)
+                counts = b.value_counts().sort_index()
+                rating_dist = [{'rating': float(k), 'count': int(v)} for k, v in counts.items() if int(v) > 0]
 
         # 4. Top 10 Restaurants
         top_rest = df.groupby('name').agg({
@@ -291,10 +358,9 @@ def dashboard_analytics():
         popular_locs = restaurants_by_location[:10]
 
         # 6. Popular Dishes
-        all_dishes_list = list(all_dishes)[:10]
         popular_dishes = [
-            {'dish': dish.title(), 'count': int(np.random.randint(5, 50))}
-            for dish in all_dishes_list
+            {'dish': str(d).title(), 'count': int(c)}
+            for d, c in (_dishes_cache["top_dishes"] or [])
         ]
 
         # 7. Success Rate Distribution
@@ -303,29 +369,28 @@ def dashboard_analytics():
             {'range': '20-40%', 'count': 0},
             {'range': '40-60%', 'count': 0},
             {'range': '60-80%', 'count': 0},
-            {'range': '80-100%', 'count': 0}
+            {'range': '80-100%', 'count': 0},
         ]
-        
-        for sr in df['success_rate']:
-            if sr < 0.2:
-                success_ranges[0]['count'] += 1
-            elif sr < 0.4:
-                success_ranges[1]['count'] += 1
-            elif sr < 0.6:
-                success_ranges[2]['count'] += 1
-            elif sr < 0.8:
-                success_ranges[3]['count'] += 1
-            else:
-                success_ranges[4]['count'] += 1
+        if 'success_rate' in df.columns:
+            sr = pd.to_numeric(df['success_rate'], errors='coerce').dropna()
+            if not sr.empty:
+                # Clamp to [0, 1] if values are stored as fractions
+                sr = sr.clip(lower=0, upper=1)
+                hist, _ = np.histogram(sr.to_numpy(), bins=[0, 0.2, 0.4, 0.6, 0.8, 1.0000001])
+                for i, v in enumerate(hist.tolist()):
+                    success_ranges[i]['count'] = int(v)
 
         # 8. Cost vs Rating
         cost_rating = []
-        sample_size = min(100, len(df))
-        for _, row in df.sample(sample_size).iterrows():
-            cost_rating.append({
-                'cost': float(row.get('approx_cost(for two people)', 300)),
-                'rating': float(row.get('rate', 3.5))
-            })
+        sample_size = min(150, len(df))
+        if sample_size > 0:
+            sample = df.sample(sample_size)
+            cost_col = 'approx_cost(for two people)'
+            costs = pd.to_numeric(sample[cost_col], errors='coerce') if cost_col in sample.columns else pd.Series([300] * sample_size)
+            rates = pd.to_numeric(sample['rate'], errors='coerce') if 'rate' in sample.columns else pd.Series([3.5] * sample_size)
+            costs = costs.fillna(300)
+            rates = rates.fillna(3.5)
+            cost_rating = [{'cost': float(c), 'rating': float(r)} for c, r in zip(costs.tolist(), rates.tolist())]
 
         # 9. Distance Distribution
         distance_ranges = [
@@ -336,21 +401,14 @@ def dashboard_analytics():
             {'range': '4-5 km', 'count': 0},
             {'range': '5+ km', 'count': 0}
         ]
-        
-        for i in range(len(df)):
-            dist = np.random.uniform(0, 5.5)
-            if dist < 1:
-                distance_ranges[0]['count'] += 1
-            elif dist < 2:
-                distance_ranges[1]['count'] += 1
-            elif dist < 3:
-                distance_ranges[2]['count'] += 1
-            elif dist < 4:
-                distance_ranges[3]['count'] += 1
-            elif dist < 5:
-                distance_ranges[4]['count'] += 1
-            else:
-                distance_ranges[5]['count'] += 1
+        # Simulated distances for visualization; keep it lightweight
+        dist_sample_n = min(3000, max(500, len(df) // 10))
+        dists = np.random.uniform(0, 5.5, dist_sample_n)
+        hist, _ = np.histogram(dists, bins=[0, 1, 2, 3, 4, 5, 5.5])
+        for i, v in enumerate(hist.tolist()):
+            distance_ranges[i]['count'] = int(v)
+        # Put any overflow (exactly 5.5) into 5+ bucket (rare)
+        distance_ranges[-1]['count'] += int((dists >= 5).sum() - hist[-1])
 
         analytics = {
             'restaurants_by_location': restaurants_by_location,
@@ -364,11 +422,15 @@ def dashboard_analytics():
             'distance_distribution': distance_ranges
         }
 
-        return jsonify({
+        payload = {
             'success': True,
             'stats': stats,
             'analytics': analytics
-        })
+        }
+
+        _dashboard_cache["ts"] = now
+        _dashboard_cache["payload"] = payload
+        return jsonify(payload)
 
     except Exception as e:
         print(f"Error: {str(e)}")
@@ -732,15 +794,19 @@ def explore_location():
             restaurant_details.append({
                 'name': rest_name,
                 'type': display_type,
+                'type_raw': rest_type,
                 'dishes': sorted(list(set(rest_dishes)))  # Unique, sorted dishes
             })
 
         # Calculate stats
+        # Note: "Both" should count for both veg and non-veg options.
+        veg_option_types = {'veg', 'both'}
+        nonveg_option_types = {'nonveg', 'both'}
         stats = {
             'total_restaurants': len(restaurants),
             'total_unique_dishes': len(set([d['dish'] for d in unique_dishes])),
-            'veg_restaurants': len([r for r in restaurant_details if 'Veg' in r['type']]),
-            'nonveg_restaurants': len([r for r in restaurant_details if 'Non-Veg' in r['type']])
+            'veg_restaurants': sum(1 for r in restaurant_details if r.get('type_raw') in veg_option_types),
+            'nonveg_restaurants': sum(1 for r in restaurant_details if r.get('type_raw') in nonveg_option_types),
         }
 
         return jsonify({
