@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Recommendation System - Home</title>
+    <title>🍽️ RestoFind - Smart Restaurant Recommendations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -11,236 +14,708 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
+        :root {
+            --primary: #FF6B6B;
+            --primary-dark: #E55A5A;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --dark: #1A1A2E;
+            --darker: #16213E;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --text: #FFFFFF;
+            --text-muted: rgba(255, 255, 255, 0.7);
         }
 
-        /* Background Animation */
-        .background {
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: var(--text);
+        }
+
+        /* ==================== SPLASH SCREEN ==================== */
+        .splash-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            z-index: -2;
-        }
-
-        .blob1 {
-            position: fixed;
-            top: -10%;
-            left: -5%;
-            width: 400px;
-            height: 400px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
-            animation: blobMove1 8s infinite;
-            z-index: -1;
-        }
-
-        .blob2 {
-            position: fixed;
-            bottom: -10%;
-            right: -5%;
-            width: 350px;
-            height: 350px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-            animation: blobMove2 7s infinite;
-            z-index: -1;
-        }
-
-        @keyframes blobMove1 {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(30px, -30px); }
-        }
-
-        @keyframes blobMove2 {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(-30px, 30px); }
-        }
-
-        /* Content */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            flex: 1;
+            background: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%);
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .splash-screen.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Animated Logo */
+        .splash-logo {
+            font-size: 4em;
+            margin-bottom: 20px;
+            animation: bounceIn 1s ease;
+        }
+
+        .splash-title {
+            font-size: 2.5em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4, #FFE66D);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 1s ease 0.3s both;
+        }
+
+        .splash-tagline {
+            font-size: 1.1em;
+            color: var(--text-muted);
+            margin-top: 10px;
+            animation: fadeInUp 1s ease 0.5s both;
+        }
+
+        /* Delivery Animation Container */
+        .delivery-animation {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            margin-top: 40px;
+            overflow: hidden;
+        }
+
+        /* Road */
+        .road {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #4ECDC4, #4ECDC4, transparent);
+        }
+
+        .road::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: repeating-linear-gradient(90deg, #FFE66D, #FFE66D 20px, transparent 20px, transparent 40px);
+            animation: roadMove 1s linear infinite;
+        }
+
+        @keyframes roadMove {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-40px);
+            }
+        }
+
+        /* Delivery Person on Scooter */
+        .scooter-container {
+            position: absolute;
+            bottom: 25px;
+            animation: scooterRide 3s ease-in-out forwards;
+        }
+
+        @keyframes scooterRide {
+            0% {
+                left: -150px;
+            }
+
+            50% {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            100% {
+                left: calc(100% + 150px);
+            }
+        }
+
+        .scooter {
+            font-size: 4em;
+            animation: scooterBounce 0.3s ease-in-out infinite;
+        }
+
+        @keyframes scooterBounce {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(-2deg);
+            }
+
+            50% {
+                transform: translateY(-5px) rotate(2deg);
+            }
+        }
+
+        /* Food Bag on Back */
+        .food-bag {
+            position: absolute;
+            top: -25px;
+            right: -10px;
+            font-size: 1.8em;
+            animation: bagBounce 0.4s ease-in-out infinite;
+        }
+
+        @keyframes bagBounce {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(5deg);
+            }
+
+            50% {
+                transform: translateY(-3px) rotate(-5deg);
+            }
+        }
+
+        /* Floating Food Items from bag */
+        .floating-foods {
+            position: absolute;
+            top: -60px;
+            right: 0;
+            display: flex;
+            gap: 5px;
+        }
+
+        .floating-food {
+            font-size: 1.2em;
+            animation: floatUp 1.5s ease-in-out infinite;
+        }
+
+        .floating-food:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .floating-food:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .floating-food:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes floatUp {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: translateY(-15px) scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        /* Loading Dots */
+        .loading-dots {
+            display: flex;
+            gap: 8px;
+            margin-top: 30px;
+            animation: fadeInUp 1s ease 0.7s both;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary);
+            animation: dotPulse 1.4s ease-in-out infinite;
+        }
+
+        .dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+            background: var(--secondary);
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+            background: var(--accent);
+        }
+
+        @keyframes dotPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.3);
+                opacity: 0.7;
+            }
+        }
+
+        /* ==================== MAIN CONTENT ==================== */
+        .main-content {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .main-content.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Floating Background Elements */
+        .bg-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .floating-emoji {
+            position: absolute;
+            font-size: 2em;
+            opacity: 0.15;
+            animation: floatAround 20s linear infinite;
+        }
+
+        .floating-emoji:nth-child(1) {
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .floating-emoji:nth-child(2) {
+            top: 20%;
+            right: 10%;
+            animation-delay: 2s;
+            font-size: 2.5em;
+        }
+
+        .floating-emoji:nth-child(3) {
+            top: 60%;
+            left: 8%;
+            animation-delay: 4s;
+        }
+
+        .floating-emoji:nth-child(4) {
+            top: 80%;
+            right: 5%;
+            animation-delay: 6s;
+            font-size: 1.8em;
+        }
+
+        .floating-emoji:nth-child(5) {
+            top: 40%;
+            left: 3%;
+            animation-delay: 8s;
+        }
+
+        .floating-emoji:nth-child(6) {
+            top: 70%;
+            right: 15%;
+            animation-delay: 10s;
+            font-size: 2.2em;
+        }
+
+        .floating-emoji:nth-child(7) {
+            top: 30%;
+            right: 3%;
+            animation-delay: 12s;
+        }
+
+        .floating-emoji:nth-child(8) {
+            top: 90%;
+            left: 15%;
+            animation-delay: 14s;
+            font-size: 1.6em;
+        }
+
+        @keyframes floatAround {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            25% {
+                transform: translateY(-30px) rotate(10deg);
+            }
+
+            50% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            75% {
+                transform: translateY(30px) rotate(-10deg);
+            }
+
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+        }
+
+        /* Gradient Orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 107, 107, 0.3), transparent);
+            top: -100px;
+            right: -100px;
+            animation: orbFloat 8s ease-in-out infinite;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(78, 205, 196, 0.25), transparent);
+            bottom: -50px;
+            left: -50px;
+            animation: orbFloat 10s ease-in-out infinite reverse;
+        }
+
+        .orb-3 {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(255, 230, 109, 0.2), transparent);
+            top: 50%;
+            left: 50%;
+            animation: orbFloat 12s ease-in-out infinite;
+        }
+
+        @keyframes orbFloat {
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            50% {
+                transform: translate(30px, -30px);
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            position: relative;
             z-index: 1;
         }
 
-        /* Navigation Bar */
+        /* ==================== NAVBAR ==================== */
         .navbar {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
             padding: 15px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 40px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 50px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
         }
 
         .logo {
-            font-size: 1.8em;
-            font-weight: 700;
-            color: white;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            font-size: 1.6em;
+            font-weight: 700;
+        }
+
+        .logo-icon {
+            font-size: 1.4em;
+            animation: logoWiggle 2s ease-in-out infinite;
+        }
+
+        @keyframes logoWiggle {
+
+            0%,
+            100% {
+                transform: rotate(0deg);
+            }
+
+            25% {
+                transform: rotate(-10deg);
+            }
+
+            75% {
+                transform: rotate(10deg);
+            }
+        }
+
+        .logo-text {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .nav-links {
             display: flex;
-            gap: 20px;
+            gap: 10px;
         }
 
         .nav-link {
-            color: white;
+            color: var(--text-muted);
             text-decoration: none;
             font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 8px;
+            padding: 10px 20px;
+            border-radius: 12px;
             transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.1);
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: -1;
         }
 
         .nav-link:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
+            color: var(--text);
         }
 
-        /* Header */
-        .header {
+        .nav-link:hover::before {
+            left: 0;
+            opacity: 1;
+        }
+
+        /* ==================== HERO SECTION ==================== */
+        .hero {
             text-align: center;
+            padding: 40px 0 60px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(78, 205, 196, 0.2));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.9em;
+            margin-bottom: 25px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .badge-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--secondary);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(78, 205, 196, 0.5);
+            }
+
+            50% {
+                box-shadow: 0 0 0 10px rgba(78, 205, 196, 0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 3.5em;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            animation: fadeInUp 0.8s ease 0.1s both;
+        }
+
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2em;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 30px;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        .hero-emojis {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 2em;
+            margin-bottom: 30px;
+            animation: fadeInUp 0.8s ease 0.3s both;
+        }
+
+        .hero-emoji {
+            animation: emojiFloat 3s ease-in-out infinite;
+        }
+
+        .hero-emoji:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .hero-emoji:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        .hero-emoji:nth-child(3) {
+            animation-delay: 1s;
+        }
+
+        .hero-emoji:nth-child(4) {
+            animation-delay: 1.5s;
+        }
+
+        .hero-emoji:nth-child(5) {
+            animation-delay: 2s;
+        }
+
+        @keyframes emojiFloat {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* ==================== CARDS GRID ==================== */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
             margin-bottom: 60px;
         }
 
-        .header h1 {
-            font-size: 4em;
-            color: white;
-            margin-bottom: 15px;
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            animation: slideDown 0.8s ease;
-        }
-
-        .header p {
-            font-size: 1.3em;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 10px;
-            animation: slideDown 0.8s ease 0.1s backwards;
-        }
-
-        .header-subtitle {
-            font-size: 1.1em;
-            color: rgba(255, 255, 255, 0.8);
-            animation: slideDown 0.8s ease 0.2s backwards;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Cards Grid */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-            gap: 30px;
-            margin-bottom: 50px;
-        }
-
-        /* Glassmorphism Card */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.15);
+        .feature-card {
+            background: var(--card-bg);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 40px 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 35px;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
-            animation: slideUp 0.8s ease;
+            animation: fadeInUp 0.8s ease both;
         }
 
-        .glass-card:hover {
-            transform: translateY(-15px);
-            background: rgba(255, 255, 255, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+        .feature-card:nth-child(1) {
+            animation-delay: 0.1s;
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .feature-card:nth-child(2) {
+            animation-delay: 0.2s;
         }
 
-        .glass-card:nth-child(1) { animation-delay: 0.1s; }
-        .glass-card:nth-child(2) { animation-delay: 0.2s; }
-        .glass-card:nth-child(3) { animation-delay: 0.3s; }
+        .feature-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
 
-        .glass-card::before {
+        .feature-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+            background: linear-gradient(135deg,
+                    rgba(255, 107, 107, 0.1),
+                    rgba(78, 205, 196, 0.1));
             opacity: 0;
             transition: opacity 0.4s ease;
         }
 
-        .glass-card:hover::before {
+        .feature-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .feature-card:hover::before {
             opacity: 1;
         }
 
         .card-icon {
-            font-size: 4em;
-            margin-bottom: 20px;
-            display: block;
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            margin-bottom: 25px;
             transition: transform 0.3s ease;
         }
 
-        .glass-card:hover .card-icon {
+        .feature-card:hover .card-icon {
             transform: scale(1.1) rotate(5deg);
         }
 
+        .card-icon.explore {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+        }
+
+        .card-icon.recommend {
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+        }
+
+        .card-icon.dashboard {
+            background: linear-gradient(135deg, #A855F7, #6366F1);
+        }
+
         .card-title {
-            font-size: 1.8em;
-            color: white;
-            margin-bottom: 15px;
+            font-size: 1.6em;
             font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .card-description {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 1em;
+            color: var(--text-muted);
+            font-size: 0.95em;
             line-height: 1.6;
             margin-bottom: 25px;
         }
@@ -251,27 +726,26 @@
         }
 
         .card-features li {
-            color: rgba(255, 255, 255, 0.85);
-            font-size: 0.95em;
-            margin-bottom: 8px;
-            padding-left: 25px;
+            color: var(--text-muted);
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            padding-left: 28px;
             position: relative;
         }
 
-        .card-features li:before {
-            content: '✓';
+        .card-features li::before {
+            content: '✨';
             position: absolute;
             left: 0;
-            color: #4caf50;
-            font-weight: bold;
+            font-size: 0.9em;
         }
 
-        .card-button {
-            background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.9) 100%);
-            color: #667eea;
+        .card-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
             padding: 14px 28px;
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             font-size: 1em;
             font-weight: 600;
             cursor: pointer;
@@ -279,99 +753,194 @@
             width: 100%;
             text-transform: uppercase;
             letter-spacing: 1px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
         }
 
-        .card-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-            background: white;
+        .card-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
         }
 
-        /* Stats Section */
+        .card-btn.secondary {
+            background: linear-gradient(135deg, var(--secondary), #44A08D);
+            box-shadow: 0 8px 25px rgba(78, 205, 196, 0.3);
+        }
+
+        .card-btn.secondary:hover {
+            box-shadow: 0 15px 35px rgba(78, 205, 196, 0.4);
+        }
+
+        .card-btn.purple {
+            background: linear-gradient(135deg, #A855F7, #6366F1);
+            box-shadow: 0 8px 25px rgba(168, 85, 247, 0.3);
+        }
+
+        .card-btn.purple:hover {
+            box-shadow: 0 15px 35px rgba(168, 85, 247, 0.4);
+        }
+
+        /* ==================== STATS SECTION ==================== */
         .stats-section {
-            background: rgba(255, 255, 255, 0.15);
+            background: var(--card-bg);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
             padding: 40px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            margin-top: 40px;
+            margin-bottom: 60px;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+
+        .stats-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 35px;
         }
 
         .stats-title {
             font-size: 2em;
-            color: white;
-            margin-bottom: 30px;
-            text-align: center;
             font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            gap: 25px;
         }
 
         .stat-card {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 25px;
-            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 30px;
+            border-radius: 20px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
         }
 
         .stat-card:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-5px);
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .stat-icon {
+            font-size: 2em;
+            margin-bottom: 15px;
         }
 
         .stat-number {
-            font-size: 2.5em;
-            font-weight: 700;
-            color: #4caf50;
-            margin-bottom: 10px;
+            font-size: 2.8em;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
         }
 
         .stat-label {
-            color: rgba(255, 255, 255, 0.85);
-            font-size: 0.95em;
+            color: var(--text-muted);
+            font-size: 0.9em;
             text-transform: uppercase;
             letter-spacing: 1px;
+            font-weight: 500;
         }
 
-        /* Footer */
+        /* ==================== FOOTER ==================== */
         .footer {
             text-align: center;
-            color: rgba(255, 255, 255, 0.7);
-            padding: 30px 20px;
+            padding: 40px 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
-            margin-top: 40px;
+            color: var(--text-muted);
+            animation: fadeInUp 0.8s ease 0.5s both;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2.5em;
+        .footer-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .footer p {
+            font-size: 0.95em;
+        }
+
+        /* ==================== ANIMATIONS ==================== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
             }
 
-            .header p {
-                font-size: 1.1em;
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2em;
+            }
+
+            .hero-subtitle {
+                font-size: 1em;
             }
 
             .navbar {
                 flex-direction: column;
-                gap: 20px;
+                gap: 15px;
+                padding: 20px;
             }
 
             .nav-links {
-                flex-direction: column;
-                width: 100%;
-            }
-
-            .nav-link {
-                text-align: center;
+                flex-wrap: wrap;
+                justify-content: center;
             }
 
             .cards-grid {
@@ -381,129 +950,251 @@
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+
+            .splash-title {
+                font-size: 1.8em;
+            }
+
+            .scooter {
+                font-size: 3em;
+            }
         }
     </style>
 </head>
+
 <body>
-    <!-- Background Blobs -->
-    <div class="background"></div>
-    <div class="blob1"></div>
-    <div class="blob2"></div>
+    <!-- SPLASH SCREEN -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-logo">🍽️</div>
+        <div class="splash-title">RestoFind</div>
+        <div class="splash-tagline">Discover Your Perfect Restaurant</div>
 
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Navigation Bar -->
-        <div class="navbar">
-            <div class="logo">🍽️ RestoFind</div>
-            <div class="nav-links">
-                <span class="nav-link" onclick="window.location.hash='#home'">Home</span>
-                <span class="nav-link" onclick="navigateTo('/explore')">Explore</span>
-                <span class="nav-link" onclick="navigateTo('/recommend')">Recommended</span>
-                <span class="nav-link" onclick="navigateTo('/dashboard')">Dashboard</span>
+        <!-- Delivery Animation -->
+        <div class="delivery-animation">
+            <div class="road"></div>
+            <div class="scooter-container">
+                <div class="floating-foods">
+                    <span class="floating-food">🍕</span>
+                    <span class="floating-food">🍔</span>
+                    <span class="floating-food">🍜</span>
+                </div>
+                <div class="food-bag">🎒</div>
+                <div class="scooter">🛵</div>
             </div>
         </div>
 
-        <!-- Header -->
-        <div class="header">
-            <h1>🍽️ Find Your Perfect Restaurant</h1>
-            <p>Powered by Machine Learning & Advanced Analytics</p>
-            <p class="header-subtitle">Explore, Discover, Enjoy</p>
+        <div class="loading-dots">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
         </div>
+    </div>
 
-        <!-- Cards Grid -->
-        <div class="cards-grid">
-            <!-- Explore Card -->
-            <div class="glass-card" onclick="navigateTo('/explore')">
-                <span class="card-icon">🔍</span>
-                <div class="card-title">Explore</div>
-                <p class="card-description">Discover all restaurants and dishes in your area</p>
-                <ul class="card-features">
-                    <li>Browse all restaurants</li>
-                    <li>See available dishes</li>
-                    <li>View location stats</li>
-                    <li>Get complete data</li>
-                </ul>
-                <button class="card-button">Explore Now</button>
+    <!-- BACKGROUND ELEMENTS -->
+    <div class="bg-shapes">
+        <span class="floating-emoji">🍕</span>
+        <span class="floating-emoji">🍔</span>
+        <span class="floating-emoji">🍜</span>
+        <span class="floating-emoji">🍣</span>
+        <span class="floating-emoji">🌮</span>
+        <span class="floating-emoji">🍱</span>
+        <span class="floating-emoji">🥘</span>
+        <span class="floating-emoji">🍛</span>
+    </div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content" id="mainContent">
+        <div class="container">
+            <!-- NAVBAR -->
+            <nav class="navbar">
+                <div class="logo">
+                    <span class="logo-icon">🍽️</span>
+                    <span class="logo-text">RestoFind</span>
+                </div>
+                <div class="nav-links">
+                    <span class="nav-link" onclick="window.location.hash='#home'">🏠 Home</span>
+                    <span class="nav-link" onclick="navigateTo('/explore')">🔍 Explore</span>
+                    <span class="nav-link" onclick="navigateTo('/recommend')">⭐ Recommend</span>
+                    <span class="nav-link" onclick="navigateTo('/dashboard')">📊 Dashboard</span>
+                </div>
+            </nav>
+
+            <!-- HERO SECTION -->
+            <section class="hero">
+                <div class="hero-badge">
+                    <span class="badge-dot"></span>
+                    <span>AI-Powered Recommendations</span>
+                </div>
+                <h1>Find Your <span class="highlight">Perfect Restaurant</span> 🍽️</h1>
+                <p class="hero-subtitle">Smart ML-powered recommendations tailored to your taste, budget, and location
+                </p>
+
+                <div class="hero-emojis">
+                    <span class="hero-emoji">🍕</span>
+                    <span class="hero-emoji">🍔</span>
+                    <span class="hero-emoji">🍜</span>
+                    <span class="hero-emoji">🍣</span>
+                    <span class="hero-emoji">🌮</span>
+                </div>
+            </section>
+
+            <!-- FEATURE CARDS -->
+            <div class="cards-grid">
+                <!-- Explore Card -->
+                <div class="feature-card" onclick="navigateTo('/explore')">
+                    <div class="card-icon explore">🔍</div>
+                    <div class="card-title">Explore Locations 🗺️</div>
+                    <p class="card-description">Discover all restaurants and dishes available in your area with our
+                        interactive explorer.</p>
+                    <ul class="card-features">
+                        <li>Browse all restaurants nearby</li>
+                        <li>View complete dish menus</li>
+                        <li>Filter by veg/non-veg options</li>
+                        <li>Get location-based stats</li>
+                    </ul>
+                    <button class="card-btn">Start Exploring 🚀</button>
+                </div>
+
+                <!-- Recommendation Card -->
+                <div class="feature-card" onclick="navigateTo('/recommend')">
+                    <div class="card-icon recommend">⭐</div>
+                    <div class="card-title">Get Recommendations 🎯</div>
+                    <p class="card-description">Receive personalized top 5 restaurant picks powered by our smart ML
+                        algorithm.</p>
+                    <ul class="card-features">
+                        <li>ML-powered smart search</li>
+                        <li>Top 5 curated restaurants</li>
+                        <li>Budget-friendly filtering</li>
+                        <li>Success rate predictions</li>
+                    </ul>
+                    <button class="card-btn secondary">Get Recommendations ✨</button>
+                </div>
+
+                <!-- Dashboard Card -->
+                <div class="feature-card" onclick="navigateTo('/dashboard')">
+                    <div class="card-icon dashboard">📊</div>
+                    <div class="card-title">Analytics Dashboard 📈</div>
+                    <p class="card-description">Explore comprehensive analytics with beautiful charts and insights.</p>
+                    <ul class="card-features">
+                        <li>Interactive visualizations</li>
+                        <li>Location-wise analytics</li>
+                        <li>Rating distributions</li>
+                        <li>Popular dish trends</li>
+                    </ul>
+                    <button class="card-btn purple">View Analytics 📊</button>
+                </div>
             </div>
 
-            <!-- Recommended Card -->
-            <div class="glass-card" onclick="navigateTo('/recommend')">
-                <span class="card-icon">⭐</span>
-                <div class="card-title">Recommended</div>
-                <p class="card-description">Get personalized restaurant recommendations</p>
-                <ul class="card-features">
-                    <li>ML-powered search</li>
-                    <li>Top 5 restaurants</li>
-                    <li>Smart filtering</li>
-                    <li>Best ratings first</li>
-                </ul>
-                <button class="card-button">Get Recommendations</button>
-            </div>
-
-            <!-- Dashboard Card -->
-            <div class="glass-card" onclick="navigateTo('/dashboard')">
-                <span class="card-icon">📊</span>
-                <div class="card-title">Dashboard</div>
-                <p class="card-description">Analyze restaurant data with interactive charts</p>
-                <ul class="card-features">
-                    <li>Overall statistics</li>
-                    <li>Location analytics</li>
-                    <li>Search patterns</li>
-                    <li>Performance metrics</li>
-                </ul>
-                <button class="card-button">View Analytics</button>
-            </div>
-        </div>
-
-        <!-- Stats Section -->
-        <div class="stats-section">
-            <div class="stats-title">📈 Platform Overview</div>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number" id="totalRestaurants">0</div>
-                    <div class="stat-label">Total Restaurants</div>
+            <!-- STATS SECTION -->
+            <div class="stats-section">
+                <div class="stats-header">
+                    <span style="font-size: 2em;">📈</span>
+                    <h2 class="stats-title">Platform Statistics</h2>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="totalDishes">0</div>
-                    <div class="stat-label">Unique Dishes</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="totalLocations">0</div>
-                    <div class="stat-label">Locations</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="avgRating">0</div>
-                    <div class="stat-label">Avg Rating</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">🏪</div>
+                        <div class="stat-number" id="totalRestaurants">0</div>
+                        <div class="stat-label">Restaurants</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🍽️</div>
+                        <div class="stat-number" id="totalDishes">0</div>
+                        <div class="stat-label">Unique Dishes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📍</div>
+                        <div class="stat-number" id="totalLocations">0</div>
+                        <div class="stat-label">Locations</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-number" id="avgRating">0</div>
+                        <div class="stat-label">Avg Rating</div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Footer -->
-        <div class="footer">
-            <p>🚀 Smart Restaurant Recommendations | 🔒 Secure & Private | 📱 Mobile Friendly</p>
+            <!-- FOOTER -->
+            <footer class="footer">
+                <div class="footer-icons">
+                    <span>🚀</span>
+                    <span>🔒</span>
+                    <span>📱</span>
+                    <span>💡</span>
+                </div>
+                <p>Smart Recommendations • Secure & Private • Mobile Friendly • AI Powered</p>
+            </footer>
         </div>
     </div>
 
     <script>
+        // SPLASH SCREEN ANIMATION
+        document.addEventListener('DOMContentLoaded', function () {
+            setTimeout(function () {
+                document.getElementById('splashScreen').classList.add('hide');
+                document.getElementById('mainContent').classList.add('show');
+            }, 3500); // Show splash for 3.5 seconds
+
+            loadStats();
+        });
+
         function loadStats() {
             fetch('/api/get-overall-stats')
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        document.getElementById('totalRestaurants').textContent = data.stats.total_restaurants;
-                        document.getElementById('totalDishes').textContent = data.stats.total_dishes;
-                        document.getElementById('totalLocations').textContent = data.stats.total_locations;
-                        document.getElementById('avgRating').textContent = data.stats.avg_rating.toFixed(2);
+                        animateNumber('totalRestaurants', data.stats.total_restaurants);
+                        animateNumber('totalDishes', data.stats.total_dishes);
+                        animateNumber('totalLocations', data.stats.total_locations);
+                        animateNumber('avgRating', data.stats.avg_rating, true);
                     }
                 })
                 .catch(err => console.error('Error:', err));
         }
 
-        function navigateTo(page) {
-            window.location.href = page;
+        function animateNumber(id, target, isFloat = false) {
+            const element = document.getElementById(id);
+            const duration = 2000;
+            const start = 0;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                // Easing function
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+
+                const current = start + (target - start) * easeOut;
+
+                if (isFloat) {
+                    element.textContent = current.toFixed(2);
+                } else {
+                    element.textContent = Math.floor(current);
+                }
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+
+            requestAnimationFrame(update);
         }
 
-        document.addEventListener('DOMContentLoaded', loadStats);
+        function navigateTo(page) {
+            // Add a small animation before navigating
+            document.getElementById('mainContent').style.opacity = '0';
+            document.getElementById('mainContent').style.transform = 'translateY(-20px)';
+
+            setTimeout(function () {
+                window.location.href = page;
+            }, 300);
+        }
     </script>
 </body>
+
 </html>
