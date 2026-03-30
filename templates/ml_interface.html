@@ -1,9 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Recommendation System</title>
+    <title>🎯 Get Recommendations - RestoFind</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- html2pdf for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -11,88 +16,253 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --primary: #FF6B6B;
+            --primary-dark: #E55A5A;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --dark: #1A1A2E;
+            --darker: #16213E;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --text: #FFFFFF;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --purple: #A855F7;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%);
             min-height: 100vh;
             padding: 20px;
+            color: var(--text);
+        }
+
+        /* Background Effects */
+        .bg-orbs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+        }
+
+        .orb-1 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(255, 107, 107, 0.25), transparent);
+            top: -100px;
+            right: -100px;
+            animation: orbFloat 8s ease-in-out infinite;
+        }
+
+        .orb-2 {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(78, 205, 196, 0.2), transparent);
+            bottom: -50px;
+            left: -50px;
+            animation: orbFloat 10s ease-in-out infinite reverse;
+        }
+
+        @keyframes orbFloat {
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            50% {
+                transform: translate(20px, -20px);
+            }
         }
 
         .container {
-            max-width: 1600px;
+            max-width: 1400px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
 
+        /* Header */
         .header {
-            text-align: center;
-            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
-        .header h1 {
-            font-size: 2em;
-            margin-bottom: 5px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
-        .header p {
-            font-size: 0.95em;
-            opacity: 0.9;
+        .back-btn {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            padding: 12px 24px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        /* ===== SECTIONS ===== */
-        .section {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(-5px);
         }
 
-        .section h2 {
-            font-size: 1.3em;
-            color: #333;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #667eea;
+        .page-title {
+            font-size: 2.2em;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        /* ===== INPUT FORM ===== */
+        .page-subtitle {
+            color: var(--text-muted);
+            font-size: 1em;
+            margin-top: 5px;
+        }
+
+        /* Glass Card */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            animation: fadeInUp 0.6s ease both;
+        }
+
+        .glass-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .glass-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .glass-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-icon {
+            font-size: 1.8em;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+
+        /* Form Styling */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
         .form-group {
-            margin-bottom: 18px;
+            display: flex;
+            flex-direction: column;
         }
 
         .form-group label {
-            display: block;
             font-weight: 600;
-            margin-bottom: 6px;
-            color: #555;
+            margin-bottom: 10px;
+            color: var(--text-muted);
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .form-group input,
         .form-group select {
-            width: 100%;
-            padding: 11px 14px;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 0.95em;
-            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 14px 18px;
+            font-size: 1em;
+            color: var(--text);
+            transition: all 0.3s ease;
             font-family: inherit;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
         }
 
         .form-group input:focus,
         .form-group select:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: var(--secondary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px rgba(78, 205, 196, 0.15);
+        }
+
+        .form-group select option {
+            background: var(--dark);
+            color: var(--text);
         }
 
         /* Budget Slider */
+        .budget-container {
+            grid-column: 1 / -1;
+        }
+
         input[type="range"] {
             width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: #e0e0e0;
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
             outline: none;
             -webkit-appearance: none;
             appearance: none;
@@ -101,464 +271,582 @@
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 18px;
-            height: 18px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            background: #667eea;
+            background: linear-gradient(135deg, var(--accent), #FFD93D);
             cursor: pointer;
+            border: 4px solid var(--dark);
+            box-shadow: 0 4px 15px rgba(255, 230, 109, 0.4);
+            transition: transform 0.2s ease;
         }
 
-        input[type="range"]::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #667eea;
-            cursor: pointer;
-            border: none;
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
         }
 
         .budget-display {
-            text-align: center;
-            margin-top: 8px;
-            font-weight: 600;
-            color: #667eea;
-            font-size: 1.1em;
-        }
-
-        .button-group {
             display: flex;
-            gap: 12px;
-            margin-top: 25px;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            margin-top: 15px;
+            background: linear-gradient(135deg, var(--accent), #FFD93D);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2em;
+            font-weight: 700;
         }
 
-        button {
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
             flex: 1;
-            padding: 12px;
+            padding: 16px;
             border: none;
-            border-radius: 6px;
-            font-size: 0.95em;
+            border-radius: 14px;
+            font-size: 1em;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
         }
 
         .btn-secondary {
-            background: #f0f0f0;
-            color: #555;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
         }
 
         .btn-secondary:hover {
-            background: #e0e0e0;
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--text);
         }
 
-        /* ===== DISHES SECTION ===== */
-        .dishes-container {
-            background: #f9f9f9;
-            border-radius: 8px;
-            padding: 15px;
+        /* Dishes Section */
+        .dishes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
         }
 
         .dish-item {
-            background: white;
-            padding: 12px 15px;
-            margin-bottom: 10px;
-            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid transparent;
+            border-radius: 14px;
+            padding: 18px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 10px;
-            border: 2px solid transparent;
+            gap: 12px;
         }
 
         .dish-item:hover {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-            transform: translateX(5px);
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.2), rgba(255, 107, 107, 0.2));
+            border-color: var(--secondary);
+            transform: translateY(-3px);
         }
 
         .dish-number {
-            background: #667eea;
-            color: white;
-            width: 28px;
-            height: 28px;
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--secondary), #44A08D);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 0.9em;
+            font-size: 0.95em;
             flex-shrink: 0;
-        }
-
-        .dish-item:hover .dish-number {
-            background: white;
-            color: #667eea;
         }
 
         .dish-name {
             font-weight: 500;
+            color: var(--text);
         }
 
-        /* ===== RESTAURANTS GRID - SIDE BY SIDE BOXES ===== */
-        .restaurants-grid {
+        /* Restaurant Cards Grid */
+        .restaurant-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 25px;
-            margin-bottom: 20px;
         }
 
-        .restaurant-box {
-            background: white;
-            border-radius: 12px;
+        .restaurant-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
             overflow: hidden;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-            transition: all 0.3s ease;
-            border: none;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
+            transition: all 0.4s ease;
+            animation: cardSlideIn 0.6s ease both;
         }
 
-        .restaurant-box:hover {
+        .restaurant-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .restaurant-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .restaurant-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .restaurant-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .restaurant-card:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        @keyframes cardSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .restaurant-card:hover {
             transform: translateY(-12px);
-            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
         }
 
-        /* TOP SECTION - COLORFUL HEADER */
-        .box-top {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 28px 20px;
+        /* Card Header - Rank Specific */
+        .card-header {
+            padding: 30px 25px;
             text-align: center;
             position: relative;
+            overflow: hidden;
+        }
+
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            opacity: 0.95;
+            z-index: 0;
+        }
+
+        .card-header>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Rank-specific colors */
+        .restaurant-card.rank-1 .card-header::before {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+        }
+
+        .restaurant-card.rank-2 .card-header::before {
+            background: linear-gradient(135deg, #C0C0C0, #A8A8A8);
+        }
+
+        .restaurant-card.rank-3 .card-header::before {
+            background: linear-gradient(135deg, #CD7F32, #B8860B);
         }
 
         .rank-emoji {
-            font-size: 2.8em;
+            font-size: 3em;
             margin-bottom: 12px;
             display: block;
+            animation: rankBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes rankBounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
         }
 
         .restaurant-name {
             font-size: 1.4em;
             font-weight: 700;
             margin-bottom: 12px;
-            letter-spacing: 0.5px;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
 
         .rank-badge {
             display: inline-block;
-            background: rgba(255,255,255,0.25);
-            padding: 6px 16px;
-            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.25);
+            padding: 6px 18px;
+            border-radius: 30px;
             font-weight: 700;
             font-size: 0.9em;
+            backdrop-filter: blur(10px);
         }
 
-        /* Rank specific colors */
-        .restaurant-box.rank-1 .box-top {
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            color: #333;
+        /* Card Content */
+        .card-content {
+            padding: 25px;
         }
 
-        .restaurant-box.rank-2 .box-top {
-            background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
-            color: #333;
-        }
-
-        .restaurant-box.rank-3 .box-top {
-            background: linear-gradient(135deg, #cd7f32 0%, #d4af7a 100%);
-            color: white;
-        }
-
-        /* MIDDLE SECTION - METRICS */
-        .box-content {
-            padding: 20px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .metric-row {
+        .metrics-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-            margin-bottom: 16px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
         .metric {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
-            padding: 12px;
-            border-radius: 8px;
-            border-top: 4px solid #667eea;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            border-radius: 14px;
             text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            transition: all 0.2s;
+            border-left: 4px solid var(--secondary);
+            transition: all 0.3s ease;
         }
 
         .metric:hover {
+            background: rgba(255, 255, 255, 0.06);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        .metric.rating { border-top-color: #ff9800; }
-        .metric.rating .value { color: #ff9800; }
+        .metric.rating {
+            border-left-color: var(--accent);
+        }
 
-        .metric.success { border-top-color: #4caf50; }
-        .metric.success .value { color: #4caf50; }
+        .metric.success {
+            border-left-color: var(--success);
+        }
 
-        .metric.cancel { border-top-color: #f44336; }
-        .metric.cancel .value { color: #f44336; }
+        .metric.cancel {
+            border-left-color: var(--danger);
+        }
 
-        .metric.distance { border-top-color: #2196f3; }
-        .metric.distance .value { color: #2196f3; }
+        .metric.distance {
+            border-left-color: #3B82F6;
+        }
 
-        .metric.cost { border-top-color: #9c27b0; }
-        .metric.cost .value { color: #9c27b0; }
+        .metric.cost {
+            border-left-color: var(--purple);
+        }
 
         .metric-label {
             font-size: 0.7em;
-            color: #999;
+            color: var(--text-muted);
             text-transform: uppercase;
-            font-weight: 700;
-            margin-bottom: 6px;
+            font-weight: 600;
             letter-spacing: 0.5px;
+            margin-bottom: 6px;
         }
 
-        .metric .value {
-            font-size: 1.5em;
+        .metric-value {
+            font-size: 1.6em;
             font-weight: 700;
         }
 
-        .metric .unit {
-            font-size: 0.75em;
-            color: #999;
+        .metric.rating .metric-value {
+            color: var(--accent);
+        }
+
+        .metric.success .metric-value {
+            color: var(--success);
+        }
+
+        .metric.cancel .metric-value {
+            color: var(--danger);
+        }
+
+        .metric.distance .metric-value {
+            color: #3B82F6;
+        }
+
+        .metric.cost .metric-value {
+            color: var(--purple);
+        }
+
+        .metric-unit {
+            font-size: 0.5em;
+            opacity: 0.7;
             margin-left: 2px;
         }
 
-        /* DISH INFO BOX */
-        .dish-info {
-            background: linear-gradient(135deg, #f3e5f5 0%, #ede7f6 100%);
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 14px;
-            border-left: 4px solid #9c27b0;
-            font-size: 0.9em;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        /* Dish Info Box */
+        .dish-info-box {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(99, 102, 241, 0.15));
+            padding: 15px;
+            border-radius: 14px;
+            border-left: 4px solid var(--purple);
+            margin-bottom: 15px;
         }
 
         .dish-info-label {
             font-size: 0.7em;
-            color: #999;
+            color: var(--text-muted);
             text-transform: uppercase;
-            font-weight: 700;
-            margin-bottom: 4px;
+            font-weight: 600;
             letter-spacing: 0.5px;
+            margin-bottom: 5px;
         }
 
         .dish-info-name {
-            color: #333;
+            color: var(--text);
             font-weight: 600;
+            font-size: 0.95em;
             line-height: 1.4;
         }
 
-        /* WHY BOX - BOTTOM MESSAGE */
+        /* Why Box */
         .why-box {
-            background: linear-gradient(135deg, #e3f2fd 0%, #ebf5fb 100%);
-            padding: 12px;
-            border-radius: 8px;
-            border-left: 4px solid #2196f3;
-            font-size: 0.85em;
-            color: #1565c0;
-            line-height: 1.5;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-            margin-top: auto;
-            font-weight: 500;
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.15), rgba(68, 160, 141, 0.15));
+            padding: 15px;
+            border-radius: 14px;
+            border-left: 4px solid var(--secondary);
         }
 
         .why-title {
-            font-weight: 700;
-            margin-bottom: 6px;
-            font-size: 0.75em;
+            font-size: 0.7em;
+            color: var(--secondary);
             text-transform: uppercase;
-            color: #0d47a1;
-            letter-spacing: 0.3px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
         }
 
-        /* ===== STATES ===== */
+        .why-text {
+            color: var(--text-muted);
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        /* States */
         .hidden {
-            display: none;
+            display: none !important;
         }
 
         .loading {
             text-align: center;
-            padding: 40px;
+            padding: 60px 20px;
         }
 
         .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--secondary);
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+            margin: 0 auto 20px;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .loading-text {
-            color: #667eea;
+            color: var(--secondary);
             font-weight: 600;
+            font-size: 1.1em;
         }
 
-        .error {
-            background: #ffebee;
-            color: #c62828;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            border-left: 4px solid #c62828;
+        .error-box {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-left: 4px solid var(--danger);
+            padding: 20px;
+            border-radius: 14px;
+            color: var(--danger);
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: #999;
+            color: var(--text-muted);
         }
 
         .empty-icon {
-            font-size: 3em;
+            font-size: 4em;
             margin-bottom: 15px;
         }
 
         /* Responsive */
-        @media (max-width: 1200px) {
-            .restaurants-grid {
-                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            }
-        }
-
         @media (max-width: 768px) {
-            .restaurants-grid {
+            .page-title {
+                font-size: 1.6em;
+            }
+
+            .restaurant-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .metric-row {
+
+            .metrics-grid {
                 grid-template-columns: 1fr;
             }
 
-            .box-top {
-                padding: 22px;
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
             }
 
-            .rank-emoji {
-                font-size: 2.3em;
-            }
-
-            .restaurant-name {
-                font-size: 1.2em;
+            .btn-group {
+                flex-direction: column;
             }
         }
     </style>
 </head>
+
 <body>
+    <!-- Background Orbs -->
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
     <div class="container">
+        <!-- Header -->
         <div class="header">
-            <h1>🍽️ Restaurant Recommendation System</h1>
-            <p>Find Your Perfect Restaurant</p>
+            <div class="header-left">
+                <a href="/" class="back-btn">← Back to Home</a>
+            </div>
+            <div>
+                <h1 class="page-title">🎯 Get Recommendations</h1>
+                <p class="page-subtitle">Find your perfect restaurant match</p>
+            </div>
         </div>
 
         <!-- SECTION 1: INPUT FORM -->
-        <div class="section" id="inputSection">
-            <h2>🔍 Enter Your Preferences</h2>
-            
-            <div class="form-group">
-                <label>📍 Enter location:</label>
-                <select id="location" required>
-                    <option value="">-- Select Location --</option>
-                </select>
+        <div class="glass-card" id="inputSection">
+            <div class="section-header">
+                <span class="section-icon">🔍</span>
+                <h2 class="section-title">Enter Your Preferences</h2>
             </div>
 
-            <div class="form-group">
-                <label>🍖 Veg / Non-Veg:</label>
-                <select id="foodType" required>
-                    <option value="">-- Select --</option>
-                    <option value="veg">Veg</option>
-                    <option value="nonveg">Non-Veg</option>
-                </select>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>📍 Select Location</label>
+                    <select id="location" required>
+                        <option value="">-- Choose Location --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>🥗 Food Preference</label>
+                    <select id="foodType" required>
+                        <option value="">-- Select Type --</option>
+                        <option value="veg">🥬 Vegetarian</option>
+                        <option value="nonveg">🍗 Non-Vegetarian</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>🍛 Favorite Dish</label>
+                    <input type="text" id="favDish" placeholder="e.g., Biryani, Pasta, Pizza..." required>
+                </div>
+
+                <div class="form-group budget-container">
+                    <label>💰 Budget (for two people)</label>
+                    <input type="range" id="budget" min="100" max="5000" value="500" step="50">
+                    <div class="budget-display">₹<span id="budgetValue">500</span></div>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label>🍛 Favourite dish:</label>
-                <input type="text" id="favDish" placeholder="e.g., Chicken, Biryani..." required>
-            </div>
-
-            <div class="form-group">
-                <label>💰 Budget (for two people):</label>
-                <input type="range" id="budget" min="1" max="5000" value="300" step="10">
-                <div class="budget-display">₹<span id="budgetValue">300</span></div>
-            </div>
-
-            <div class="button-group">
-                <button class="btn-primary" onclick="showDishes()">🔎 Show Related Dishes</button>
-                <button class="btn-secondary" onclick="resetAll()">🔄 Reset</button>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="showDishes()">
+                    <span>🔎</span> Find Dishes
+                </button>
+                <button class="btn btn-secondary" onclick="resetAll()">
+                    <span>🔄</span> Reset
+                </button>
             </div>
         </div>
 
         <!-- SECTION 2: DISHES -->
-        <div class="section hidden" id="dishesSection">
-            <h2>🍽️ Related dishes found in this location:</h2>
-            <div class="dishes-container" id="dishesContainer"></div>
-            
-            <div class="button-group" style="margin-top: 20px;">
-                <button class="btn-secondary" onclick="goBack()">← Back</button>
+        <div class="glass-card hidden" id="dishesSection">
+            <div class="section-header">
+                <span class="section-icon">🍽️</span>
+                <h2 class="section-title">Select a Dish</h2>
+            </div>
+            <div class="dishes-grid" id="dishesContainer"></div>
+
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="goBack()">
+                    <span>←</span> Back
+                </button>
             </div>
         </div>
 
         <!-- SECTION 3: RECOMMENDATIONS -->
-        <div class="section hidden" id="resultsSection">
-            <h2>✅ TOP 5 RECOMMENDED RESTAURANTS</h2>
-            <div class="restaurants-grid" id="resultsContainer"></div>
-            
-            <div class="button-group" style="margin-top: 20px;">
-                <button class="btn-secondary" onclick="resetAll()">🔄 Start Over</button>
+        <div class="glass-card hidden" id="resultsSection">
+            <div class="section-header">
+                <span class="section-icon">🏆</span>
+                <h2 class="section-title">Top 5 Recommendations</h2>
+            </div>
+            <div class="restaurant-grid" id="resultsContainer"></div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="downloadPDF()" id="downloadBtn" style="display:none;">
+                    <span>📥</span> Download Results (PDF)
+                </button>
+                <button class="btn btn-secondary" onclick="resetAll()">
+                    <span>🔄</span> Start Over
+                </button>
             </div>
         </div>
     </div>
 
     <script>
-        const customMessages = [
-            "⭐ Top-rated choice with excellent success rate and quick delivery!",
-            "🚀 Great value for money with strong customer satisfaction!",
-            "💯 Popular choice in your area with reliable service!",
-            "🎯 Consistent performer with good ratings and fast orders!",
-            "✨ Hidden gem with amazing dishes and loyal customers!"
+        const whyMessages = [
+            "⭐ Top-rated with excellent success rate and quick delivery!",
+            "🚀 Great value for money with strong satisfaction!",
+            "💯 Popular choice with reliable service!",
+            "🎯 Consistent performer with fast orders!",
+            "✨ Hidden gem with loyal customers!"
         ];
 
         let allLocations = [];
         let currentDishes = [];
         let selectedDishName = null;
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             loadLocations();
-            document.getElementById('budget').addEventListener('input', function() {
+            document.getElementById('budget').addEventListener('input', function () {
                 document.getElementById('budgetValue').textContent = this.value;
             });
         });
@@ -587,7 +875,7 @@
             const dish = document.getElementById('favDish').value;
 
             if (!location || !foodType || !dish) {
-                alert('Please fill all fields');
+                alert('Please fill all fields! 📝');
                 return;
             }
 
@@ -606,19 +894,19 @@
                     dish: dish
                 })
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success && data.suggestions && data.suggestions.length > 0) {
-                    currentDishes = data.suggestions;
-                    displayDishes(data.suggestions);
-                } else {
-                    showError('dishesContainer', 'No dishes found');
-                }
-            })
-            .catch(err => {
-                console.error('Error:', err);
-                showError('dishesContainer', 'Error loading dishes');
-            });
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.suggestions && data.suggestions.length > 0) {
+                        currentDishes = data.suggestions;
+                        displayDishes(data.suggestions);
+                    } else {
+                        showError('dishesContainer', 'No matching dishes found 😕');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    showError('dishesContainer', 'Error loading dishes');
+                });
         }
 
         function displayDishes(dishes) {
@@ -663,85 +951,87 @@
                     budget: budget
                 })
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success && data.recommendations) {
-                    displayRecommendations(data.recommendations);
-                } else {
-                    showError('resultsContainer', data.error || 'No recommendations found');
-                }
-            })
-            .catch(err => {
-                console.error('Error:', err);
-                showError('resultsContainer', 'Error fetching recommendations');
-            });
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.recommendations) {
+                        displayRecommendations(data.recommendations);
+                    } else {
+                        showError('resultsContainer', data.error || 'No recommendations found');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    showError('resultsContainer', 'Error fetching recommendations');
+                });
         }
 
         function displayRecommendations(recommendations) {
             const container = document.getElementById('resultsContainer');
 
             if (!recommendations || recommendations.length === 0) {
-                container.innerHTML = '<div class="error">No restaurants found. Try different criteria.</div>';
+                container.innerHTML = '<div class="error-box">No restaurants found. Try different criteria.</div>';
+                document.getElementById('downloadBtn').style.display = 'none';
                 return;
             }
+
+            // Store recommendations for PDF download
+            lastRecommendations = recommendations;
+            console.log('Stored ' + lastRecommendations.length + ' recommendations for PDF');
+
+            // Show download button
+            document.getElementById('downloadBtn').style.display = 'flex';
 
             let html = '';
 
             recommendations.forEach((r, idx) => {
                 const rankEmoji = r.rank === 1 ? '🥇' : r.rank === 2 ? '🥈' : r.rank === 3 ? '🥉' : '⭐';
                 const rankClass = `rank-${r.rank}`;
-                const message = customMessages[idx] || customMessages[0];
+                const message = whyMessages[idx] || whyMessages[0];
 
                 html += `
-                    <div class="restaurant-box ${rankClass}">
-                        <div class="box-top">
-                            <div class="rank-emoji">${rankEmoji}</div>
+                    <div class="restaurant-card ${rankClass}">
+                        <div class="card-header">
+                            <span class="rank-emoji">${rankEmoji}</span>
                             <div class="restaurant-name">${r.name}</div>
-                            <div class="rank-badge">#${r.rank}</div>
+                            <span class="rank-badge">#${r.rank}</span>
                         </div>
                         
-                        <div class="box-content">
-                            <div class="metric-row">
+                        <div class="card-content">
+                            <div class="metrics-grid">
                                 <div class="metric rating">
                                     <div class="metric-label">⭐ Predicted</div>
-                                    <div class="value">${r.predicted_rating}<span class="unit">/5</span></div>
+                                    <div class="metric-value">${r.predicted_rating}<span class="metric-unit">/5</span></div>
                                 </div>
                                 <div class="metric rating">
                                     <div class="metric-label">📊 Actual</div>
-                                    <div class="value">${r.actual_rating}<span class="unit">/5</span></div>
+                                    <div class="metric-value">${r.actual_rating}<span class="metric-unit">/5</span></div>
                                 </div>
-                            </div>
-
-                            <div class="metric-row">
                                 <div class="metric success">
                                     <div class="metric-label">✅ Success</div>
-                                    <div class="value">${r.success_rate}<span class="unit">%</span></div>
+                                    <div class="metric-value">${r.success_rate}<span class="metric-unit">%</span></div>
                                 </div>
                                 <div class="metric cancel">
                                     <div class="metric-label">❌ Cancel</div>
-                                    <div class="value">${r.cancellation_rate}<span class="unit">%</span></div>
+                                    <div class="metric-value">${r.cancellation_rate}<span class="metric-unit">%</span></div>
                                 </div>
-                            </div>
-
-                            <div class="metric-row">
                                 <div class="metric distance">
                                     <div class="metric-label">📍 Distance</div>
-                                    <div class="value">${r.distance_km}<span class="unit">km</span></div>
+                                    <div class="metric-value">${r.distance_km}<span class="metric-unit">km</span></div>
                                 </div>
                                 <div class="metric cost">
                                     <div class="metric-label">💰 Cost</div>
-                                    <div class="value">₹${r.cost_for_two}</div>
+                                    <div class="metric-value">₹${r.cost_for_two}</div>
                                 </div>
                             </div>
 
-                            <div class="dish-info">
+                            <div class="dish-info-box">
                                 <div class="dish-info-label">🍽️ Best Dish</div>
                                 <div class="dish-info-name">${r.best_dish}</div>
                             </div>
 
                             <div class="why-box">
                                 <div class="why-title">💡 Why This?</div>
-                                <div>${message}</div>
+                                <div class="why-text">${message}</div>
                             </div>
                         </div>
                     </div>
@@ -755,14 +1045,14 @@
             document.getElementById(containerId).innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
-                    <div class="loading-text">Loading...</div>
+                    <div class="loading-text">Finding the best options for you... 🍽️</div>
                 </div>
             `;
         }
 
         function showError(containerId, message) {
             document.getElementById(containerId).innerHTML = `
-                <div class="error">${message}</div>
+                <div class="error-box">❌ ${message}</div>
                 <div class="empty-state">
                     <div class="empty-icon">😕</div>
                     <p>Try different search criteria</p>
@@ -780,14 +1070,181 @@
             document.getElementById('location').value = '';
             document.getElementById('foodType').value = '';
             document.getElementById('favDish').value = '';
-            document.getElementById('budget').value = '300';
-            document.getElementById('budgetValue').textContent = '300';
+            document.getElementById('budget').value = '500';
+            document.getElementById('budgetValue').textContent = '500';
             selectedDishName = null;
-            
+            lastRecommendations = [];
+
             document.getElementById('inputSection').classList.remove('hidden');
             document.getElementById('dishesSection').classList.add('hidden');
             document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('downloadBtn').style.display = 'none';
+        }
+
+        // Store recommendations for PDF
+        let lastRecommendations = [];
+
+        function openPrintViewAndPrint(html, title = 'RestoFind - Results') {
+            const w = window.open('', '_blank');
+            if (!w) {
+                alert('Popup blocked. Please allow popups for this site.');
+                return;
+            }
+
+            w.document.open();
+            w.document.write(`
+                <!doctype html>
+                <html lang="en">
+                  <head>
+                    <meta charset="utf-8" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1" />
+                    <title>${title}</title>
+                    <style>
+                      :root { color-scheme: light; }
+                      body { margin: 0; padding: 0; font-family: Arial, sans-serif; background: #fff; color: #111; }
+                      .wrap { padding: 24px; }
+                      .toolbar {
+                        position: sticky;
+                        top: 0;
+                        background: #fff;
+                        padding: 12px 0;
+                        border-bottom: 1px solid #eee;
+                        margin-bottom: 16px;
+                        display: flex;
+                        gap: 10px;
+                        align-items: center;
+                        justify-content: space-between;
+                      }
+                      .toolbar button {
+                        padding: 10px 14px;
+                        border: 1px solid #ddd;
+                        background: #f8f8f8;
+                        cursor: pointer;
+                        border-radius: 8px;
+                        font-weight: 600;
+                      }
+                      .hint { font-size: 12px; color: #666; }
+
+                      /* Print tuning */
+                      @page { margin: 10mm; }
+                      @media print {
+                        .toolbar { display: none !important; }
+                        .wrap { padding: 0; }
+                      }
+                    </style>
+                  </head>
+                  <body>
+                    <div class="wrap">
+                      <div class="toolbar">
+                        <button onclick="window.print()">Save as PDF / Print</button>
+                        <div class="hint">Tip: choose “Save as PDF” in the printer list.</div>
+                      </div>
+                      ${html}
+                    </div>
+                    <script>
+                      // Auto-open print dialog once content is rendered.
+                      window.addEventListener('load', () => {
+                        setTimeout(() => window.print(), 300);
+                      });
+                    <\/script>
+                  </body>
+                </html>
+            `);
+            w.document.close();
+        }
+
+        function downloadPDF() {
+            const location = document.getElementById('location').value;
+            const foodType = document.getElementById('foodType').value;
+            const budget = document.getElementById('budget').value;
+            const timestamp = new Date().toLocaleString();
+
+            // Build PDF content
+            let pdfHTML = `
+                <div style="font-family: 'Poppins', Arial, sans-serif; padding: 30px; background: #fff; color: #333;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h1 style="color: #FF6B6B; font-size: 28px; margin: 0;">🍽️ RestoFind</h1>
+                        <p style="color: #666; margin: 5px 0;">Restaurant Recommendation Results</p>
+                        <p style="color: #999; font-size: 12px;">Generated: ${timestamp}</p>
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 25px;">
+                        <h2 style="color: #4ECDC4; font-size: 18px; margin: 0 0 15px 0;">📝 Your Search Criteria</h2>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="padding: 8px 0; color: #666;"><strong>📍 Location:</strong></td>
+                                <td style="padding: 8px 0;">${location.toUpperCase()}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: #666;"><strong>🥗 Food Type:</strong></td>
+                                <td style="padding: 8px 0;">${foodType === 'veg' ? '🥬 Vegetarian' : '🍗 Non-Vegetarian'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: #666;"><strong>🍛 Selected Dish:</strong></td>
+                                <td style="padding: 8px 0;">${selectedDishName}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: #666;"><strong>💰 Budget:</strong></td>
+                                <td style="padding: 8px 0;">₹${budget} for two</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h2 style="color: #FF6B6B; font-size: 20px; margin: 25px 0 15px 0;">🏆 Top 5 Recommended Restaurants</h2>
+            `;
+
+            // Add each restaurant
+            lastRecommendations.forEach((r, idx) => {
+                const rankEmoji = r.rank === 1 ? '🥇' : r.rank === 2 ? '🥈' : r.rank === 3 ? '🥉' : '⭐';
+                const bgColor = r.rank === 1 ? '#FFF8E7' : r.rank === 2 ? '#F5F5F5' : r.rank === 3 ? '#FDF5E6' : '#ffffff';
+
+                pdfHTML += `
+                    <div style="background: ${bgColor}; border: 1px solid #eee; border-radius: 12px; padding: 20px; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <h3 style="margin: 0; color: #333; font-size: 16px;">
+                                ${rankEmoji} #${r.rank} ${r.name}
+                            </h3>
+                        </div>
+                        <table style="width: 100%; font-size: 13px;">
+                            <tr>
+                                <td style="padding: 5px 0; color: #666;">⭐ Predicted Rating:</td>
+                                <td><strong>${r.predicted_rating}/5</strong></td>
+                                <td style="padding: 5px 0; color: #666;">📊 Actual Rating:</td>
+                                <td><strong>${r.actual_rating}/5</strong></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 5px 0; color: #666;">✅ Success Rate:</td>
+                                <td><strong style="color: #10B981;">${r.success_rate}%</strong></td>
+                                <td style="padding: 5px 0; color: #666;">❌ Cancellation:</td>
+                                <td><strong style="color: #EF4444;">${r.cancellation_rate}%</strong></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 5px 0; color: #666;">📍 Distance:</td>
+                                <td><strong>${r.distance_km} km</strong></td>
+                                <td style="padding: 5px 0; color: #666;">💰 Cost for Two:</td>
+                                <td><strong style="color: #A855F7;">₹${r.cost_for_two}</strong></td>
+                            </tr>
+                        </table>
+                        <div style="margin-top: 10px; padding: 10px; background: #e8f4f8; border-radius: 8px;">
+                            <strong style="color: #4ECDC4;">🍽️ Best Dish:</strong> ${r.best_dish}
+                        </div>
+                    </div>
+                `;
+            });
+
+            pdfHTML += `
+                    <div style="margin-top: 30px; padding: 20px; background: #f0f8ff; border-radius: 12px; text-align: center;">
+                        <p style="color: #666; margin: 0; font-size: 12px;">Thank you for using RestoFind! 🍽️</p>
+                        <p style="color: #999; margin: 5px 0 0 0; font-size: 11px;">AI-Powered Restaurant Recommendations</p>
+                    </div>
+                </div>
+            `;
+
+            // Your requested behavior: open a single-page output view and let the user save it.
+            // This works even when html2pdf CDN is blocked.
+            openPrintViewAndPrint(pdfHTML, `RestoFind_${location}_Results`);
         }
     </script>
 </body>
+
 </html>
