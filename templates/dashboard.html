@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics Dashboard - Restaurant Recommendation System</title>
+    <title>📊 Analytics Dashboard - RestoFind</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -13,19 +15,95 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --primary: #FF6B6B;
+            --primary-dark: #E55A5A;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --dark: #1A1A2E;
+            --darker: #16213E;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --text: #FFFFFF;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --purple: #A855F7;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%);
             min-height: 100vh;
             padding: 20px;
+            color: var(--text);
+        }
+
+        /* Background Effects */
+        .bg-orbs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.2), transparent);
+            top: -100px;
+            right: -100px;
+            animation: orbFloat 8s ease-in-out infinite;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(78, 205, 196, 0.15), transparent);
+            bottom: 20%;
+            left: -80px;
+            animation: orbFloat 10s ease-in-out infinite reverse;
+        }
+
+        .orb-3 {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(255, 107, 107, 0.15), transparent);
+            bottom: -50px;
+            right: 20%;
+            animation: orbFloat 12s ease-in-out infinite;
+        }
+
+        @keyframes orbFloat {
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            50% {
+                transform: translate(25px, -25px);
+            }
         }
 
         .container {
             max-width: 1600px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
 
-        /* HEADER */
+        /* Header */
         .header {
             display: flex;
             justify-content: space-between;
@@ -33,138 +111,251 @@
             margin-bottom: 40px;
             flex-wrap: wrap;
             gap: 20px;
+            animation: fadeInDown 0.6s ease;
         }
 
-        .header h1 {
-            font-size: 2.5em;
-            color: white;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .home-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.4);
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .home-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.05);
-        }
-
-        /* GLASS CARD */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-            margin-bottom: 30px;
-        }
-
-        .glass-card h2 {
-            color: white;
-            margin-bottom: 25px;
-            font-size: 1.8em;
+        .header-left {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            gap: 20px;
         }
 
-        /* STATS GRID */
+        .page-title {
+            font-size: 2.5em;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--purple), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .back-btn {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            padding: 12px 24px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(-5px);
+        }
+
+        /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
             margin-bottom: 40px;
         }
 
         .stat-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            padding: 20px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
             text-align: center;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease both;
+        }
+
+        .stat-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .stat-card:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .stat-card:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .stat-card:nth-child(4) {
+            animation-delay: 0.25s;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
         }
 
         .stat-card:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-5px);
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            display: block;
         }
 
         .stat-value {
-            font-size: 2.5em;
-            font-weight: 700;
-            color: #ffd700;
+            font-size: 2.8em;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 8px;
         }
 
         .stat-label {
+            color: var(--text-muted);
             font-size: 0.9em;
-            color: rgba(255, 255, 255, 0.85);
+            text-transform: uppercase;
+            letter-spacing: 1px;
             font-weight: 500;
         }
 
-        /* CHARTS GRID */
+        /* Glass Card for sections */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            animation: fadeInUp 0.6s ease 0.3s both;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-icon {
+            font-size: 2em;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Charts Grid */
         .charts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
             gap: 30px;
-            margin-bottom: 30px;
         }
 
-        .chart-container {
-            position: relative;
-            height: 400px;
+        .chart-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 25px;
+            transition: all 0.3s ease;
         }
 
-        /* SINGLE COLUMN CHARTS */
-        .full-width {
+        .chart-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-5px);
+        }
+
+        .chart-card.full-width {
             grid-column: 1 / -1;
         }
 
-        .chart-wrapper {
-            position: relative;
-            height: 100%;
+        .chart-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        /* LOADING STATE */
+        .chart-container {
+            height: 350px;
+            position: relative;
+        }
+
+        /* Loading */
         .loading {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 400px;
-            color: white;
-            font-size: 1.2em;
+            height: 300px;
         }
 
         .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid white;
-            border-radius: 50%;
             width: 50px;
             height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--secondary);
+            border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-right: 15px;
+            margin-bottom: 15px;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
-        /* RESPONSIVE */
+        .loading-text {
+            color: var(--secondary);
+            font-weight: 500;
+        }
+
+        /* Responsive */
         @media (max-width: 1024px) {
             .charts-grid {
                 grid-template-columns: 1fr;
@@ -172,100 +363,98 @@
         }
 
         @media (max-width: 768px) {
-            .header h1 {
+            .page-title {
                 font-size: 1.8em;
             }
 
-            .glass-card {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .stat-card {
                 padding: 20px;
             }
 
-            .chart-container {
-                height: 300px;
+            .stat-value {
+                font-size: 2em;
             }
-        }
 
-        /* LEGEND STYLING */
-        .custom-legend {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.9em;
-        }
-
-        .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
+            .chart-container {
+                height: 280px;
+            }
         }
     </style>
 </head>
+
 <body>
+    <!-- Background Orbs -->
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
     <div class="container">
-        <!-- HEADER -->
+        <!-- Header -->
         <div class="header">
-            <h1>📊 Analytics Dashboard</h1>
-            <a href="/" class="home-btn">← Back to Home</a>
+            <div class="header-left">
+                <a href="/" class="back-btn">← Back to Home</a>
+            </div>
+            <h1 class="page-title">📊 Analytics Dashboard</h1>
         </div>
 
-        <!-- OVERALL STATS -->
+        <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card">
+                <span class="stat-icon">🏪</span>
                 <div class="stat-value" id="totalRestaurants">0</div>
-                <div class="stat-label">Total Restaurants</div>
+                <div class="stat-label">Restaurants</div>
             </div>
             <div class="stat-card">
+                <span class="stat-icon">📍</span>
                 <div class="stat-value" id="totalLocations">0</div>
                 <div class="stat-label">Locations</div>
             </div>
             <div class="stat-card">
+                <span class="stat-icon">⭐</span>
                 <div class="stat-value" id="avgRating">0</div>
                 <div class="stat-label">Avg Rating</div>
             </div>
             <div class="stat-card">
+                <span class="stat-icon">🍽️</span>
                 <div class="stat-value" id="totalDishes">0</div>
                 <div class="stat-label">Unique Dishes</div>
             </div>
         </div>
 
-        <!-- OVERALL ANALYTICS SECTION -->
+        <!-- Overall Analytics -->
         <div class="glass-card">
-            <h2>📈 Overall Statistics</h2>
+            <div class="section-header">
+                <span class="section-icon">📈</span>
+                <h2 class="section-title">Overall Statistics</h2>
+            </div>
             <div class="charts-grid">
-                <!-- Restaurants by Location -->
-                <div class="glass-card">
+                <div class="chart-card">
+                    <div class="chart-title">🏙️ Restaurants by Location</div>
                     <div class="chart-container">
                         <canvas id="restaurantsByLocationChart"></canvas>
                     </div>
                 </div>
-
-                <!-- Veg vs Non-Veg Distribution -->
-                <div class="glass-card">
+                <div class="chart-card">
+                    <div class="chart-title">🥗 Veg vs Non-Veg Distribution</div>
                     <div class="chart-container">
                         <canvas id="vegNonVegChart"></canvas>
                     </div>
                 </div>
-
-                <!-- Rating Distribution -->
-                <div class="glass-card full-width">
+                <div class="chart-card full-width">
+                    <div class="chart-title">⭐ Rating Distribution</div>
                     <div class="chart-container">
                         <canvas id="ratingDistributionChart"></canvas>
                     </div>
                 </div>
-
-                <!-- Top Restaurants by Rating -->
-                <div class="glass-card full-width">
+                <div class="chart-card full-width">
+                    <div class="chart-title">🏆 Top 10 Restaurants</div>
                     <div class="chart-container">
                         <canvas id="topRestaurantsChart"></canvas>
                     </div>
@@ -273,33 +462,33 @@
             </div>
         </div>
 
-        <!-- USER SEARCH PATTERNS SECTION -->
+        <!-- User Search Patterns -->
         <div class="glass-card">
-            <h2>👥 User Search Patterns</h2>
+            <div class="section-header">
+                <span class="section-icon">👥</span>
+                <h2 class="section-title">Search Patterns & Trends</h2>
+            </div>
             <div class="charts-grid">
-                <!-- Most Searched Locations -->
-                <div class="glass-card">
+                <div class="chart-card">
+                    <div class="chart-title">🔥 Popular Locations</div>
                     <div class="chart-container">
                         <canvas id="searchedLocationsChart"></canvas>
                     </div>
                 </div>
-
-                <!-- Most Searched Dishes -->
-                <div class="glass-card">
+                <div class="chart-card">
+                    <div class="chart-title">🍕 Popular Dishes</div>
                     <div class="chart-container">
                         <canvas id="searchedDishesChart"></canvas>
                     </div>
                 </div>
-
-                <!-- Success Rate Distribution -->
-                <div class="glass-card full-width">
+                <div class="chart-card full-width">
+                    <div class="chart-title">✅ Success Rate Distribution</div>
                     <div class="chart-container">
                         <canvas id="successRateChart"></canvas>
                     </div>
                 </div>
-
-                <!-- Cost vs Rating Correlation -->
-                <div class="glass-card full-width">
+                <div class="chart-card full-width">
+                    <div class="chart-title">💰 Cost vs Rating Analysis</div>
                     <div class="chart-container">
                         <canvas id="costRatingChart"></canvas>
                     </div>
@@ -307,11 +496,15 @@
             </div>
         </div>
 
-        <!-- DISTANCE ANALYSIS -->
+        <!-- Distance Analysis -->
         <div class="glass-card">
-            <h2>📍 Distance Analysis</h2>
+            <div class="section-header">
+                <span class="section-icon">📍</span>
+                <h2 class="section-title">Distance Analysis</h2>
+            </div>
             <div class="charts-grid">
-                <div class="glass-card full-width">
+                <div class="chart-card full-width">
+                    <div class="chart-title">🚗 Distance Distribution</div>
                     <div class="chart-container">
                         <canvas id="distanceChart"></canvas>
                     </div>
@@ -323,25 +516,21 @@
     <script>
         let charts = {};
 
-        // Chart colors
-        const colors = {
-            primary: '#667eea',
-            secondary: '#764ba2',
-            accent: '#f093fb',
-            gold: '#ffd700',
-            green: '#4caf50',
-            red: '#f44336',
-            blue: '#2196f3',
-            orange: '#ff9800'
-        };
-
+        // Enhanced color palette
         const chartColors = [
-            '#667eea', '#764ba2', '#f093fb', '#ffd700',
-            '#4caf50', '#f44336', '#2196f3', '#ff9800',
-            '#9c27b0', '#00bcd4', '#ff5722', '#795548'
+            '#FF6B6B', '#4ECDC4', '#FFE66D', '#A855F7',
+            '#10B981', '#F59E0B', '#3B82F6', '#EC4899',
+            '#8B5CF6', '#06B6D4', '#F97316', '#84CC16'
         ];
 
-        document.addEventListener('DOMContentLoaded', function() {
+        const gradients = {
+            primary: ['#FF6B6B', '#FF8E53'],
+            secondary: ['#4ECDC4', '#44A08D'],
+            accent: ['#FFE66D', '#FFD93D'],
+            purple: ['#A855F7', '#6366F1']
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
             loadDashboardData();
         });
 
@@ -360,38 +549,42 @@
         }
 
         function updateStats(stats) {
-            document.getElementById('totalRestaurants').textContent = stats.total_restaurants;
-            document.getElementById('totalLocations').textContent = stats.total_locations;
-            document.getElementById('avgRating').textContent = stats.avg_rating.toFixed(2);
-            document.getElementById('totalDishes').textContent = stats.total_dishes;
+            animateNumber('totalRestaurants', stats.total_restaurants);
+            animateNumber('totalLocations', stats.total_locations);
+            animateNumber('avgRating', stats.avg_rating, true);
+            animateNumber('totalDishes', stats.total_dishes);
+        }
+
+        function animateNumber(id, target, isFloat = false) {
+            const element = document.getElementById(id);
+            const duration = 2000;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const current = target * easeOut;
+
+                element.textContent = isFloat ? current.toFixed(2) : Math.floor(current);
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+
+            requestAnimationFrame(update);
         }
 
         function createCharts(data) {
-            // 1. Restaurants by Location (Horizontal Bar)
             createRestaurantsByLocationChart(data.restaurants_by_location);
-
-            // 2. Veg vs Non-Veg (Pie)
             createVegNonVegChart(data.veg_nonveg_distribution);
-
-            // 3. Rating Distribution (Histogram)
             createRatingDistributionChart(data.rating_distribution);
-
-            // 4. Top Restaurants (Bar)
             createTopRestaurantsChart(data.top_restaurants);
-
-            // 5. Most Searched Locations (Bar)
             createSearchedLocationsChart(data.popular_locations);
-
-            // 6. Most Searched Dishes (Bar)
             createSearchedDishesChart(data.popular_dishes);
-
-            // 7. Success Rate Distribution (Line)
             createSuccessRateChart(data.success_rate_distribution);
-
-            // 8. Cost vs Rating (Scatter)
             createCostRatingChart(data.cost_rating_data);
-
-            // 9. Distance Analysis (Area)
             createDistanceChart(data.distance_distribution);
         }
 
@@ -400,13 +593,13 @@
             charts.locationChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: data.map(d => d.location),
+                    labels: data.slice(0, 10).map(d => d.location),
                     datasets: [{
-                        label: 'Number of Restaurants',
-                        data: data.map(d => d.count),
+                        label: 'Restaurants',
+                        data: data.slice(0, 10).map(d => d.count),
                         backgroundColor: chartColors,
-                        borderColor: 'rgba(255, 255, 255, 0.3)',
-                        borderWidth: 2
+                        borderRadius: 8,
+                        borderSkipped: false
                     }]
                 },
                 options: {
@@ -414,12 +607,17 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { labels: { color: 'rgba(255, 255, 255, 0.8)' } },
-                        title: { display: false }
+                        legend: { display: false }
                     },
                     scales: {
-                        x: { ticks: { color: 'rgba(255, 255, 255, 0.6)' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
-                        y: { ticks: { color: 'rgba(255, 255, 255, 0.6)' }, grid: { display: false } }
+                        x: {
+                            ticks: { color: 'rgba(255,255,255,0.6)' },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        },
+                        y: {
+                            ticks: { color: 'rgba(255,255,255,0.8)' },
+                            grid: { display: false }
+                        }
                     }
                 }
             });
@@ -433,18 +631,23 @@
                     labels: Object.keys(data),
                     datasets: [{
                         data: Object.values(data),
-                        backgroundColor: ['#4caf50', '#f44336', '#2196f3'],
-                        borderColor: 'rgba(255, 255, 255, 0.3)',
-                        borderWidth: 2
+                        backgroundColor: ['#10B981', '#EF4444', '#3B82F6'],
+                        borderWidth: 0,
+                        hoverOffset: 10
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    cutout: '60%',
                     plugins: {
                         legend: {
-                            labels: { color: 'rgba(255, 255, 255, 0.8)' },
-                            position: 'bottom'
+                            position: 'bottom',
+                            labels: {
+                                color: 'rgba(255,255,255,0.8)',
+                                padding: 20,
+                                font: { size: 12 }
+                            }
                         }
                     }
                 }
@@ -453,27 +656,40 @@
 
         function createRatingDistributionChart(data) {
             const ctx = document.getElementById('ratingDistributionChart').getContext('2d');
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 350);
+            gradient.addColorStop(0, 'rgba(255, 230, 109, 0.8)');
+            gradient.addColorStop(1, 'rgba(255, 230, 109, 0.1)');
+
             charts.ratingChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: data.map(d => d.rating.toFixed(1)),
+                    labels: data.map(d => '⭐ ' + d.rating.toFixed(1)),
                     datasets: [{
-                        label: 'Number of Restaurants',
+                        label: 'Restaurants',
                         data: data.map(d => d.count),
-                        backgroundColor: '#667eea',
-                        borderColor: 'rgba(255, 255, 255, 0.3)',
-                        borderWidth: 2
+                        backgroundColor: gradient,
+                        borderColor: '#FFE66D',
+                        borderWidth: 2,
+                        borderRadius: 10,
+                        borderSkipped: false
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { labels: { color: 'rgba(255, 255, 255, 0.8)' } }
+                        legend: { display: false }
                     },
                     scales: {
-                        y: { ticks: { color: 'rgba(255, 255, 255, 0.6)' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
-                        x: { ticks: { color: 'rgba(255, 255, 255, 0.6)' }, grid: { display: false } }
+                        y: {
+                            ticks: { color: 'rgba(255,255,255,0.6)' },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        },
+                        x: {
+                            ticks: { color: 'rgba(255,255,255,0.8)' },
+                            grid: { display: false }
+                        }
                     }
                 }
             });
@@ -484,13 +700,13 @@
             charts.topRestaurants = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: data.map(d => d.name),
+                    labels: data.map(d => d.name.substring(0, 20)),
                     datasets: [{
                         label: 'Rating',
                         data: data.map(d => d.rating),
-                        backgroundColor: '#ffd700',
-                        borderColor: 'rgba(255, 255, 255, 0.3)',
-                        borderWidth: 2
+                        backgroundColor: '#FFE66D',
+                        borderRadius: 8,
+                        borderSkipped: false
                     }]
                 },
                 options: {
@@ -498,11 +714,19 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { labels: { color: 'rgba(255, 255, 255, 0.8)' } }
+                        legend: { display: false }
                     },
                     scales: {
-                        x: { ticks: { color: 'rgba(255, 255, 255, 0.6)' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
-                        y: { ticks: { color: 'rgba(255, 255, 255, 0.6)' }, grid: { display: false } }
+                        x: {
+                            min: 0,
+                            max: 5,
+                            ticks: { color: 'rgba(255,255,255,0.6)' },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        },
+                        y: {
+                            ticks: { color: 'rgba(255,255,255,0.8)' },
+                            grid: { display: false }
+                        }
                     }
                 }
             });
@@ -515,11 +739,11 @@
                 data: {
                     labels: data.map(d => d.location),
                     datasets: [{
-                        label: 'Search Count',
+                        label: 'Searches',
                         data: data.map(d => d.count),
-                        backgroundColor: '#764ba2',
-                        borderColor: 'rgba(255, 255, 255, 0.3)',
-                        borderWidth: 2
+                        backgroundColor: '#A855F7',
+                        borderRadius: 8,
+                        borderSkipped: false
                     }]
                 },
                 options: {
@@ -527,11 +751,17 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { labels: { color: 'rgba(255, 255, 255, 0.8)' } }
+                        legend: { display: false }
                     },
                     scales: {
-                        x: { ticks: { color: 'rgba(255, 255, 255, 0.6)' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
-                        y: { ticks: { color: 'rgba(255, 255, 255, 0.6)' }, grid: { display: false } }
+                        x: {
+                            ticks: { color: 'rgba(255,255,255,0.6)' },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        },
+                        y: {
+                            ticks: { color: 'rgba(255,255,255,0.8)' },
+                            grid: { display: false }
+                        }
                     }
                 }
             });
@@ -544,11 +774,11 @@
                 data: {
                     labels: data.map(d => d.dish),
                     datasets: [{
-                        label: 'Search Count',
+                        label: 'Searches',
                         data: data.map(d => d.count),
-                        backgroundColor: '#f093fb',
-                        borderColor: 'rgba(255, 255, 255, 0.3)',
-                        borderWidth: 2
+                        backgroundColor: '#FF6B6B',
+                        borderRadius: 8,
+                        borderSkipped: false
                     }]
                 },
                 options: {
@@ -556,11 +786,17 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { labels: { color: 'rgba(255, 255, 255, 0.8)' } }
+                        legend: { display: false }
                     },
                     scales: {
-                        x: { ticks: { color: 'rgba(255, 255, 255, 0.6)' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
-                        y: { ticks: { color: 'rgba(255, 255, 255, 0.6)' }, grid: { display: false } }
+                        x: {
+                            ticks: { color: 'rgba(255,255,255,0.6)' },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        },
+                        y: {
+                            ticks: { color: 'rgba(255,255,255,0.8)' },
+                            grid: { display: false }
+                        }
                     }
                 }
             });
@@ -568,29 +804,44 @@
 
         function createSuccessRateChart(data) {
             const ctx = document.getElementById('successRateChart').getContext('2d');
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 350);
+            gradient.addColorStop(0, 'rgba(16, 185, 129, 0.6)');
+            gradient.addColorStop(1, 'rgba(16, 185, 129, 0.05)');
+
             charts.successRate = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: data.map(d => d.range),
                     datasets: [{
-                        label: 'Number of Restaurants',
+                        label: 'Restaurants',
                         data: data.map(d => d.count),
-                        borderColor: '#4caf50',
-                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        borderColor: '#10B981',
+                        backgroundColor: gradient,
                         borderWidth: 3,
                         fill: true,
-                        tension: 0.4
+                        tension: 0.4,
+                        pointBackgroundColor: '#10B981',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { labels: { color: 'rgba(255, 255, 255, 0.8)' } }
+                        legend: { display: false }
                     },
                     scales: {
-                        y: { ticks: { color: 'rgba(255, 255, 255, 0.6)' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
-                        x: { ticks: { color: 'rgba(255, 255, 255, 0.6)' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }
+                        y: {
+                            ticks: { color: 'rgba(255,255,255,0.6)' },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        },
+                        x: {
+                            ticks: { color: 'rgba(255,255,255,0.8)' },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        }
                     }
                 }
             });
@@ -606,10 +857,10 @@
                         data: data.map(d => ({
                             x: d.cost,
                             y: d.rating,
-                            r: 8
+                            r: 10
                         })),
-                        backgroundColor: 'rgba(102, 126, 234, 0.6)',
-                        borderColor: 'rgba(255, 255, 255, 0.3)',
+                        backgroundColor: 'rgba(78, 205, 196, 0.6)',
+                        borderColor: '#4ECDC4',
                         borderWidth: 2
                     }]
                 },
@@ -617,18 +868,26 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { labels: { color: 'rgba(255, 255, 255, 0.8)' } }
+                        legend: { display: false }
                     },
                     scales: {
                         y: {
-                            title: { display: true, text: 'Rating', color: 'rgba(255, 255, 255, 0.8)' },
-                            ticks: { color: 'rgba(255, 255, 255, 0.6)' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            title: {
+                                display: true,
+                                text: 'Rating',
+                                color: 'rgba(255,255,255,0.8)'
+                            },
+                            ticks: { color: 'rgba(255,255,255,0.6)' },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
                         },
                         x: {
-                            title: { display: true, text: 'Cost (₹)', color: 'rgba(255, 255, 255, 0.8)' },
-                            ticks: { color: 'rgba(255, 255, 255, 0.6)' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            title: {
+                                display: true,
+                                text: 'Cost (₹)',
+                                color: 'rgba(255,255,255,0.8)'
+                            },
+                            ticks: { color: 'rgba(255,255,255,0.6)' },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
                         }
                     }
                 }
@@ -637,33 +896,49 @@
 
         function createDistanceChart(data) {
             const ctx = document.getElementById('distanceChart').getContext('2d');
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 350);
+            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.6)');
+            gradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)');
+
             charts.distance = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: data.map(d => d.range),
                     datasets: [{
-                        label: 'Number of Restaurants',
+                        label: 'Restaurants',
                         data: data.map(d => d.count),
-                        borderColor: '#2196f3',
-                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        borderColor: '#3B82F6',
+                        backgroundColor: gradient,
                         borderWidth: 3,
                         fill: true,
-                        tension: 0.4
+                        tension: 0.4,
+                        pointBackgroundColor: '#3B82F6',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { labels: { color: 'rgba(255, 255, 255, 0.8)' } }
+                        legend: { display: false }
                     },
                     scales: {
-                        y: { ticks: { color: 'rgba(255, 255, 255, 0.6)' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
-                        x: { ticks: { color: 'rgba(255, 255, 255, 0.6)' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }
+                        y: {
+                            ticks: { color: 'rgba(255,255,255,0.6)' },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        },
+                        x: {
+                            ticks: { color: 'rgba(255,255,255,0.8)' },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        }
                     }
                 }
             });
         }
     </script>
 </body>
+
 </html>
